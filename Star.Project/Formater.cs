@@ -12,57 +12,33 @@ using Shimakaze.Struct.Ini;
 
 namespace Star.Project
 {
-    public class Cleanner
+    public class Formater
     {
         public const string FILE_INPUT = "--file-input";
         public const string FILE_OUTPUT = "--file-output";
-        public const string IGNORE_CASE = "--ignore-case";
+        public const string MATCH_CASE = "--match-case";
         public const string KEEP_KEYS = "--keep-keys";
         public const string KEEP_SECTIONS = "--keep-sections";
-        public const string NAME = "cleanner";
+        public const string NAME = "format";
         private static async Task ParseAsync(ParseResult parseResult)
         {
-            var input = parseResult.ValueForOption<FileInfo>(FILE_INPUT);
-            var output = parseResult.ValueForOption<FileInfo>(FILE_OUTPUT);
-            var keys = parseResult.ValueForOption<string[]>(KEEP_KEYS);
-            var sections = parseResult.ValueForOption<string[]>(KEEP_SECTIONS);
-            var ignore = parseResult.ValueForOption<bool>(IGNORE_CASE);
-
-            Debug.WriteLine($"input\t:{input}");
-            Debug.WriteLine($"output\t:{output}");
-            Debug.WriteLine($"ignore case\t:{ignore}");
-            if (!(keys is null))
-            {
-                Debug.WriteLine("Keys:");
-                Parallel.ForEach(keys, i => Debug.WriteLine($"\tkey\t:{i}"));
-            }
-            if (!(sections is null))
-            {
-                Debug.WriteLine("Sections:");
-                Parallel.ForEach(sections, i => Debug.WriteLine($"\tsection\t:{i}"));
-            }
-
-            await using var ifs = input.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
-            await using var ofs = output?.OpenWrite();
-            await using var osw = output is null ? Console.Out : new StreamWriter(ofs);
+            if (parseResult.ValueForOption<FileInfo>(FILE_INPUT) is null) return;
+            await using var ifs = parseResult.ValueForOption<FileInfo>(FILE_INPUT).Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+            await using var osw = parseResult.ValueForOption<FileInfo>(FILE_OUTPUT) is null ? Console.Out : new StreamWriter(parseResult.ValueForOption<FileInfo>(FILE_OUTPUT)?.OpenWrite());
 
             CleannerOptions options;
             options.Input = new StreamReader(ifs);
             options.Output = osw;
-            options.Keys = keys?.Select(i => i.Trim()).ToArray();
-            options.Sections = sections?.Select(i => i.Trim()).ToArray();
-            options.IgnoreCase = ignore;
+            options.Keys = parseResult.ValueForOption<string[]>(KEEP_KEYS)?.Select(i => i.Trim()).ToArray();
+            options.Sections = parseResult.ValueForOption<string[]>(KEEP_SECTIONS)?.Select(i => i.Trim()).ToArray();
+            options.MatchCase = parseResult.ValueForOption<bool>(MATCH_CASE);
             await WorkAsync(options);
         }
 
-        private static bool True() => true;
 
         public static Command GetCommand()
         {
-            var file_input = new Option<FileInfo>(FILE_INPUT, "打开一个将要被处理的文件")
-            {
-                IsRequired = true,
-            };
+            var file_input = new Option<FileInfo>(FILE_INPUT, "打开一个将要被处理的文件") { IsRequired = true };
             file_input.Argument.Name = "文件";
 
             var file_output = new Option<FileInfo>(FILE_OUTPUT, "将经过处理后的数据写入目标文件");
@@ -74,9 +50,9 @@ namespace Star.Project
             var keep_section = new Option<string[]>(KEEP_SECTIONS, "输入若干个需要保留的键, 将删除所有未在列表中的节");
             keep_section.Argument.Name = "节名";
 
-            var ignore_case = new Option<bool>(IGNORE_CASE, True, "是否区分大小写");
+            var ignore_case = new Option<bool>(MATCH_CASE, DefaultHelper.False, "是否区分大小写");
 
-            var cmd = new Command(NAME, "这个工具可以用来过滤INI节和键")
+            var cmd = new Command(NAME, "INI 格式化工具")
             {
                 file_input,
                 file_output,
@@ -104,6 +80,7 @@ namespace Star.Project
                     .ToArray()
             };
             await newIniFile.DeparseAsync(options.Output);
+            await options.Output.FlushAsync();
 
             IniSection SelectIniSection(IniSection i) => options.Keys?.Length < 1 || i.Content.Count(FilterKey) < 1
                     ? i
@@ -116,12 +93,12 @@ namespace Star.Project
 
             bool FilterSection(IniSection section) => options.Sections?.Contains(section.Name) ?? false || section.Content.Count(FilterKey) > 0;
 
-            bool FilterKey(IniKeyValuePair i) => options.Keys?.Contains(i.Key.Trim(), options.IgnoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal) ?? true;
+            bool FilterKey(IniKeyValuePair i) => options.Keys?.Contains(i.Key.Trim(), options.MatchCase ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase) ?? true;
         }
 
         public struct CleannerOptions
         {
-            public bool IgnoreCase;
+            public bool MatchCase;
             public TextReader Input;
             public string[] Keys;
             public TextWriter Output;

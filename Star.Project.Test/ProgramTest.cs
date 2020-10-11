@@ -9,21 +9,14 @@ namespace Star.Project.Test
     [TestClass]
     public class ProgramTest
     {
-        [TestMethod]
+        [TestMethod("显示程序全部帮助文本")]
         public async Task HelpTestAsync()
         {
-            Console.WriteLine("Argument: /?");
             await Program.RootCommand.InvokeAsync("/?");
-
-            Console.WriteLine("Argument: --help");
-            await Program.RootCommand.InvokeAsync("--help");
-
-            Console.WriteLine("Argument: -h");
-            await Program.RootCommand.InvokeAsync("-h");
-
-            Console.WriteLine("Argument: -?");
-            await Program.RootCommand.InvokeAsync("-?");
-
+            Console.WriteLine(new string('-', 30));
+            await Program.RootCommand.InvokeAsync(Formater.NAME + " /?");
+            Console.WriteLine(new string('-', 30));
+            await Program.RootCommand.InvokeAsync(Sorter.NAME + " /?");
         }
         [TestMethod]
         public async Task VersionTestAsync()
