@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.CommandLine.IO;
 using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.IO;
@@ -22,7 +23,6 @@ namespace Star.Project
         public const string FILE_OUTPUT = "--file-output";
         public const string PREFIX = "--prefix";
         public const string PREFIX_KEY = "--prefix-key";
-        public const string PREFIX_TEMPLATE = "--prefix-template";
         public const string SORT = "--sort";
         public const string SORT_KEYS = "--sort-keys";
         public const string START_NUM = "--start-num";
@@ -75,23 +75,25 @@ namespace Star.Project
                 constraintKey,
                 constraintValue
             };
-            cmd.Handler = CommandHandler.Create<ParseResult>(ParseAsync);
+            cmd.Handler = CommandHandler.Create<ParseResult, IConsole>(ParseAsync);
             return cmd;
         }
 
-        public static async Task ParseAsync(ParseResult parseResult)
+        public static async Task ParseAsync(ParseResult parseResult, IConsole console)
         {
-            await using var ifs = parseResult.ValueForOption<FileInfo>(FILE_INPUT).Open(FileMode.Open, FileAccess.Read, FileShare.Read);
-            await using var osw = parseResult.ValueForOption<FileInfo>(FILE_OUTPUT) is null ? Console.Out : new StreamWriter(parseResult.ValueForOption<FileInfo>(FILE_OUTPUT).OpenWrite());
-
             SortSectionOptions options;
+
+            var source = parseResult.ValueForOption<FileInfo>(FILE_INPUT);
+            var target = parseResult.ValueForOption<FileInfo>(FILE_OUTPUT);
+            await using var ifs = source.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+            await using var ofs = target?.OpenWrite();
             options.Input = new StreamReader(ifs);
-            options.Output = osw;
+            options.Output = ofs is null ? null : new StreamWriter(ofs);
+
             options.First = parseResult.ValueForOption<int>(START_NUM);
             options.Digit = parseResult.ValueForOption<int>(DIGIT);
             options.Prefix = parseResult.ValueForOption<string>(PREFIX);
             options.PrefixKey = parseResult.ValueForOption<string>(PREFIX_KEY);
-
             options.Sort = parseResult.ValueForOption<bool>(SORT);
             options.SortTargetKeys = parseResult.ValueForOption<string[]>(SORT_KEYS);
             options.OutputSection = parseResult.ValueForOption<string>(TARGET_SECTION);
@@ -99,42 +101,118 @@ namespace Star.Project
             options.KeyConstraint = parseResult.ValueForOption<string>(CONSTRAINT_KEY);
             options.ValueConstraint = parseResult.ValueForOption<string>(CONSTRAINT_VALUE);
 
-            await WorkAsync(options);
+            console.Out.Write($"[{DateTime.Now:O}]Debug\t源文件: {source}");
+            console.Out.Write($"[{DateTime.Now:O}]Debug\t目标文件: {target}");
+            console.Out.Write($"[{DateTime.Now:O}]Debug\t起始数字: {options.First}");
+            console.Out.Write($"[{DateTime.Now:O}]Debug\t长度限制: {options.Digit}");
+            console.Out.Write($"[{DateTime.Now:O}]Debug\t输出前缀: {options.Prefix}");
+            console.Out.Write($"[{DateTime.Now:O}]Debug\t前缀键: {options.PrefixKey}");
+            console.Out.Write($"[{DateTime.Now:O}]Debug\t重新排序: {options.Sort}");
+            if (options.SortTargetKeys is null)
+                console.Out.Write($"[{DateTime.Now:O}]Debug\t排序依据键: NULL");
+            else
+                console.Out.Write($"[{DateTime.Now:O}]Debug\t排序依据键: [{string.Join(", ", options.SortTargetKeys)}]");
+            console.Out.Write($"[{DateTime.Now:O}]Debug\t输出节名: {options.OutputSection}");
+            console.Out.Write($"[{DateTime.Now:O}]Debug\t注释键名: {options.SummaryKey}");
+            console.Out.Write($"[{DateTime.Now:O}]Debug\t键约束: {options.KeyConstraint}");
+            console.Out.Write($"[{DateTime.Now:O}]Debug\t值约束: {options.ValueConstraint}");
+
+
+            console.Out.Write($"[{DateTime.Now:O}]Info\t开始");
+            await WorkAsync(options, console);
+            console.Out.Write($"[{DateTime.Now:O}]Info\t完成");
         }
 
-        public static async Task WorkAsync(SortSectionOptions options)
+        public static async Task WorkAsync(SortSectionOptions options, IConsole console)
         {
             var ini = await IniDocument.ParseAsync(options.Input);
-            IEnumerable<IniSection> Result;// 约束筛选
-            IEnumerable<IniKeyValuePair> result;// 结果
+            IEnumerable<IniSection> Result = ini.Sections;// 约束筛选
+            List<IniKeyValuePair> result = new List<IniKeyValuePair>();// 结果
             int num = options.First;
 
+            if (!string.IsNullOrEmpty(options.KeyConstraint))
+            {
+                console.Out.Write($"[{DateTime.Now:O}]Info\t已启用键约束");
+                if (!string.IsNullOrEmpty(options.ValueConstraint))
+                {
+                    console.Out.Write($"[{DateTime.Now:O}]Info\t已启用值约束");
+                    Result = ini.Sections.Where(i => i.TryGetKey(options.KeyConstraint)?.Value.ToString().Equals(options.ValueConstraint) ?? false);
+                }
+                else
+                {
+                    console.Out.Write($"[{DateTime.Now:O}]Info\t已启用键约束, 但未启用值约束");
+                    Result = ini.Sections.Where(i => i.TryGetKey(options.KeyConstraint, out _));
+                }
+            }
+            if (options.Sort)
+            {
+                console.Out.Write($"[{DateTime.Now:O}]Info\t已启用排序");
+                if (options.SortTargetKeys is null)
+                {
+                    console.Out.Write($"[{DateTime.Now:O}]Warn\t排序列表不存在, 将按Section名排序");
+                    Result = Result.OrderBy(i => i.Name);
+                }
+                if (options.SortTargetKeys.Length > 0)
+                {
+                    console.Out.Write($"[{DateTime.Now:O}]Info\t排序列表为空, 将按Section名排序");
+                    Result = Result.OrderBy(i => i.Name);
+                }
+                else
+                {
+                    foreach (var key in options.SortTargetKeys)
+                    {
+                        console.Out.Write($"[{DateTime.Now:O}]Trace\t正在根据键 {key} 的值排序");
+                        Result = Result.Where(i => i.TryGetKey(key, out _)).OrderBy(i => i.TryGetKey(key)?.Value.ToString());
+                    }
+                }
+            }
+            if (string.IsNullOrEmpty(options.PrefixKey))
+                if (string.IsNullOrEmpty(options.SummaryKey))
+                {
+                    foreach (var i in Result)
+                    {
+                        var key = $"{options.Prefix ?? string.Empty}{num++.ToString().PadLeft(options.Digit, '0')}";
+                        var value = i.Name;
+                        result.Add(new IniKeyValuePair(key, value));
+                    }
+                }
+                else
+                {
+                    foreach (var i in Result)
+                    {
+                        var key = $"{options.Prefix ?? string.Empty}{num++.ToString().PadLeft(options.Digit, '0')}";
+                        var value = i.Name;
+                        var summary = i.TryGetKey(options.SummaryKey)?.Value ?? string.Empty;
+                        result.Add(new IniKeyValuePair(key, value, summary));
+                    }
+                }
+            else
+                foreach (var i in Result)
+                {
+                    var prefix = string.Empty;
+                    if (string.IsNullOrEmpty(options.Prefix))
+                        prefix = i.TryGetKey(options.PrefixKey)?.Value.ToString().Trim();
+                    else
+                        prefix = options.Prefix.Replace("%s", i.TryGetKey(options.PrefixKey)?.Value.ToString().Trim());
 
-            Result = string.IsNullOrEmpty(options.KeyConstraint)// 是否有键约束
-                ? ini.Sections// 没有键约束
-                : string.IsNullOrEmpty(options.ValueConstraint)// 是否有值约束
-                    ? ini.Sections.Where(i => i.TryGetKey(options.KeyConstraint, out _))// 仅键约束
-                    : ini.Sections.Where(i => i.TryGetKey(options.KeyConstraint).Value.ToString().Equals(options.ValueConstraint));// 值约束
+                    var key = $"{prefix}{num++.ToString().PadLeft(options.Digit, '0')}";
+                    var value = i.Name;
+                    var summary = i.TryGetKey(options.SummaryKey)?.Value ?? string.Empty;
+                    result.Add(new IniKeyValuePair(key, value, summary));
+                }
 
-            Result = options.Sort// 是否排序
-                ? options.SortTargetKeys.Length > 0// 是否按目标键的值排序
-                    ? Result.OrderBy(i => i.Name)// 不按目标键的值排序
-                    : options.SortTargetKeys.Select(key => Result = Result.Where(i => i.TryGetKey(key, out _)).OrderBy(i => i.TryGetKey(key)?.Value.ToString()))
-                                            .Last()// 按目标值排序
-                : Result;
-
-            result = string.IsNullOrEmpty(options.PrefixKey)
-                ? string.IsNullOrEmpty(options.SummaryKey)
-                    ? Result.Select(i => new IniKeyValuePair($"{options.Prefix ?? string.Empty}{num++.ToString().PadLeft(options.Digit, '0')}", i.Name))
-                    : Result.Select(i => new IniKeyValuePair($"{options.Prefix ?? string.Empty}{num++.ToString().PadLeft(options.Digit, '0')}", i.Name, i.TryGetKey(options.SummaryKey)?.Value ?? string.Empty))
-                : Result.Select(i => new IniKeyValuePair(
-                    $"{(i.TryGetKey(options.PrefixKey, out _) ? (string.IsNullOrEmpty(options.Prefix) ? "%s" : options.Prefix).Replace("%s", i.TryGetKey(options.PrefixKey)?.Value.ToString().Trim()) : string.Empty)}" +
-                    $"{num++.ToString().PadLeft(options.Digit, '0')}", i.Name, i.TryGetKey(options.SummaryKey)?.Value ?? string.Empty));
-
+            console.Out.Write($"[{DateTime.Now:O}]Info\t输出结果");
             if (!string.IsNullOrEmpty(options.OutputSection))
-                await options.Output.WriteLineAsync($"[{options.OutputSection}]");
-            result.ToList().ForEach(async i => await options.Output.WriteLineAsync(i.ToString()));
-            await options.Output.FlushAsync();
+            {
+                console.Out.Write($"[{options.OutputSection}]");
+                await options.Output?.WriteAsync($"[{options.OutputSection}]");
+            }
+            foreach (var item in result)
+            {
+                console.Out.Write(item.ToString());
+                await options.Output?.WriteAsync(item.ToString());
+            }
+            await options.Output?.FlushAsync();
         }
 
         public struct SortSectionOptions

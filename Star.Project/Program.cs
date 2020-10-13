@@ -4,6 +4,7 @@ using System.CommandLine;
 using System.CommandLine.Binding;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
+using System.CommandLine.IO;
 using System.CommandLine.Parsing;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -15,7 +16,7 @@ namespace Star.Project
     {
         public static async Task Main(string[] args)
         {
-            await RootCommand.InvokeAsync(args);
+            await RootCommand.InvokeAsync(args, new SystemConsole());
         }
         public static RootCommand RootCommand
         {
