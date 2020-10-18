@@ -24,35 +24,84 @@ namespace Star.Project.GUI
     /// <summary>
     /// FormaterPage.xaml 的交互逻辑
     /// </summary>
-    public partial class FormaterPage
+    public partial class FormaterPage : IToolPage
     {
         public FormaterPage()
         {
             InitializeComponent();
         }
-
-        private async void FormatButton_Click(object sender, RoutedEventArgs e)
+        public async void ApplyTemplate(Button sender, FileInfo file)
         {
-            if (string.IsNullOrWhiteSpace(this.ASB_Input.Text))
+            await using var fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var sr = new StreamReader(fs);
+            while (!sr.EndOfStream)
             {
-                return;
+                var line = await sr.ReadLineAsync();
+                var dataRaw = line.Split(';', '#')[0].Split('=');
+
+                (string Key, string Value) item = (dataRaw[0], dataRaw[1]);
+
+                switch (item.Key.Trim().ToUpper())
+                {
+                    case nameof(Formater.KEEP_KEYS):
+                        this.ASB_Keep_Keys.Text = item.Value;
+                        break;
+                    case nameof(Formater.KEEP_SECTIONS):
+                        this.ASB_Keep_Sections.Text = item.Value;
+                        break;
+                    case nameof(Formater.MATCH_CASE):
+                        bool.TryParse(item.Value, out var b);
+                        this.CB_MatchCase.IsChecked = b;
+                        break;
+                    case nameof(Formater.KEEP_SECTION_INTACT):
+                        bool.TryParse(item.Value, out b);
+                        this.CB_IntAct.IsChecked = b;
+                        break;
+                    default:
+                        break;
+                }
             }
-            var btn = sender as Button;
-            btn.IsEnabled = false;
-            btn.Content = "正在处理";
+        }
+        public async void SaveTemplate(Button sender, FileInfo file)
+        {
+            var temp = new List<(string Key, string Value)>();
+            if (!string.IsNullOrWhiteSpace(this.ASB_Keep_Keys.Text))
+                temp.Add((nameof(Formater.KEEP_KEYS), this.ASB_Keep_Keys.Text));
+
+            if (!string.IsNullOrWhiteSpace(this.ASB_Keep_Sections.Text))
+                temp.Add((nameof(Formater.KEEP_SECTIONS), this.ASB_Keep_Sections.Text));
+
+            if (this.CB_MatchCase.IsChecked ?? false)
+                temp.Add((nameof(Formater.MATCH_CASE), true.ToString()));
+
+            if (this.CB_IntAct.IsChecked ?? false)
+                temp.Add((nameof(Formater.KEEP_SECTION_INTACT), true.ToString()));
+
+            await using var fs = file.OpenWrite();
+            await using var sw = new StreamWriter(fs);
+            foreach (var (Key, Value) in temp)
+                await sw.WriteLineAsync(Key + "=" + Value);
+            await sw.FlushAsync();
+        }
+
+        public async void Start(Button sender, RoutedEventArgs e)
+        {
+            var btnText = sender.Content;
+            (sender.IsEnabled, sender.Content) = (false, "正在处理");
             try
             {
+                if (string.IsNullOrWhiteSpace(this.ASB_Input.Text)) return;
                 var list = new List<string>
                 {
                     Formater.NAME,
                     Formater.FILE_INPUT,
-                    this.ASB_Input.Text
+                    $"\"{this.ASB_Input.Text}\""
                 };
 
                 if (!string.IsNullOrWhiteSpace(this.ASB_Output.Text))
                 {
                     list.Add(Formater.FILE_OUTPUT);
-                    list.Add(this.ASB_Output.Text);
+                    list.Add($"\"{this.ASB_Output.Text}\"");
                 }
 
                 if (!string.IsNullOrWhiteSpace(this.ASB_Keep_Keys.Text))
@@ -72,21 +121,21 @@ namespace Star.Project.GUI
                     list.Add(Formater.MATCH_CASE);
                 }
 
-
                 if (this.CB_IntAct.IsChecked ?? false)
                 {
                     list.Add(Formater.KEEP_SECTION_INTACT);
                 }
 
                 var sb = new StringBuilder().AppendJoin(' ', list).ToString();
-                this.consoleOutput.Document.Blocks.Clear();
-                this.E_Output.IsExpanded = true;
-                await Program.RootCommand.InvokeAsync(sb, new RichTextBoxConsole(this.consoleOutput));
+
+                var output = new ConsoleOutputDialog();
+                var dialogResultTask = output.ShowAsync();
+                await Program.RootCommand.InvokeAsync(sb, new RichTextBoxConsole(output.consoleOutput));
+                await dialogResultTask;
             }
             finally
             {
-                btn.IsEnabled = true;
-                btn.Content = "开始格式化";
+                (sender.IsEnabled, sender.Content) = (true, btnText);
             }
         }
 
