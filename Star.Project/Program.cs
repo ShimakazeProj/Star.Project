@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.CommandLine;
-using System.CommandLine.Binding;
-using System.CommandLine.Builder;
-using System.CommandLine.Help;
+﻿using System.CommandLine;
 using System.CommandLine.IO;
 using System.CommandLine.Parsing;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Star.Project
@@ -24,7 +17,8 @@ namespace Star.Project
             {
                 var cmd = new RootCommand("=StarProject= 工具集");
                 cmd.Name = "StarTools";
-                cmd.Add(Formater.GetCommand());
+                cmd.Add(KeyScreen.GetCommand());
+                cmd.Add(SectionScreen.GetCommand());
                 cmd.Add(Sorter.GetCommand());
                 return cmd;
             }
