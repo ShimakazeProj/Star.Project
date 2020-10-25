@@ -27,14 +27,17 @@
             </ui:NavigationView.PaneHeader>
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
-                    Content="格式化" Icon="Bullets"
-                    Tag="{x:Type local:FormaterPage}" />
+                    Content="键筛选器" Icon="Bullets"
+                    Tag="{x:Type local:KeyScreenPage}" />
                 <ui:NavigationViewItem
-                    Content="注册表排序" Icon="Sort"
+                    Content="节筛选器" Icon="Bullets"
+                    Tag="{x:Type local:SectionScreenPage}" />
+                <ui:NavigationViewItem
+                    Content="注册表排序器" Icon="Sort"
                     Tag="{x:Type local:SorterPage}" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.Header>
-                <TextBlock />
+                <TextBlock DataContext="{Binding Content,ElementName=ContentFrame}" Text="{Binding Title}"/>
             </ui:NavigationView.Header>
             <ui:NavigationView.Content>
                 <Grid>
@@ -42,7 +45,7 @@
                         <RowDefinition />
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
-                    <ui:Frame x:Name="contentFrame"/>
+                    <ui:Frame x:Name="ContentFrame"/>
 
                     <Border Grid.Row="1">
                         <Border.Background>

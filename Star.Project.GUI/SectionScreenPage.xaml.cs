@@ -24,11 +24,11 @@ namespace Star.Project.GUI
     /// <summary>
     /// FormaterPage.xaml 的交互逻辑
     /// </summary>
-    public partial class FormaterPage : IToolPage
+    public partial class SectionScreenPage : IToolPage
     {
-        public FormaterPage()
+        public SectionScreenPage()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
         public async void ApplyTemplate(Button sender, FileInfo file)
         {
@@ -43,19 +43,12 @@ namespace Star.Project.GUI
 
                 switch (item.Key.Trim().ToUpper())
                 {
-                    case nameof(Formater.KEEP_KEYS):
-                        this.ASB_Keep_Keys.Text = item.Value;
-                        break;
-                    case nameof(Formater.KEEP_SECTIONS):
+                    case nameof(SectionScreen.KEEP_SECTIONS):
                         this.ASB_Keep_Sections.Text = item.Value;
                         break;
-                    case nameof(Formater.MATCH_CASE):
+                    case nameof(SectionScreen.MATCH_CASE):
                         bool.TryParse(item.Value, out var b);
                         this.CB_MatchCase.IsChecked = b;
-                        break;
-                    case nameof(Formater.KEEP_SECTION_INTACT):
-                        bool.TryParse(item.Value, out b);
-                        this.CB_IntAct.IsChecked = b;
                         break;
                     default:
                         break;
@@ -65,17 +58,12 @@ namespace Star.Project.GUI
         public async void SaveTemplate(Button sender, FileInfo file)
         {
             var temp = new List<(string Key, string Value)>();
-            if (!string.IsNullOrWhiteSpace(this.ASB_Keep_Keys.Text))
-                temp.Add((nameof(Formater.KEEP_KEYS), this.ASB_Keep_Keys.Text));
 
             if (!string.IsNullOrWhiteSpace(this.ASB_Keep_Sections.Text))
-                temp.Add((nameof(Formater.KEEP_SECTIONS), this.ASB_Keep_Sections.Text));
+                temp.Add((nameof(SectionScreen.KEEP_SECTIONS), this.ASB_Keep_Sections.Text));
 
             if (this.CB_MatchCase.IsChecked ?? false)
-                temp.Add((nameof(Formater.MATCH_CASE), true.ToString()));
-
-            if (this.CB_IntAct.IsChecked ?? false)
-                temp.Add((nameof(Formater.KEEP_SECTION_INTACT), true.ToString()));
+                temp.Add((nameof(SectionScreen.MATCH_CASE), true.ToString()));
 
             await using var fs = file.OpenWrite();
             await using var sw = new StreamWriter(fs);
@@ -93,37 +81,26 @@ namespace Star.Project.GUI
                 if (string.IsNullOrWhiteSpace(this.ASB_Input.Text)) return;
                 var list = new List<string>
                 {
-                    Formater.NAME,
-                    Formater.FILE_INPUT,
+                    SectionScreen.NAME,
+                    SectionScreen.FILE_INPUT,
                     $"\"{this.ASB_Input.Text}\""
                 };
 
                 if (!string.IsNullOrWhiteSpace(this.ASB_Output.Text))
                 {
-                    list.Add(Formater.FILE_OUTPUT);
+                    list.Add(SectionScreen.FILE_OUTPUT);
                     list.Add($"\"{this.ASB_Output.Text}\"");
-                }
-
-                if (!string.IsNullOrWhiteSpace(this.ASB_Keep_Keys.Text))
-                {
-                    list.Add(Formater.KEEP_KEYS);
-                    list.AddRange(this.ASB_Keep_Keys.Text.Split(';'));
                 }
 
                 if (!string.IsNullOrWhiteSpace(this.ASB_Keep_Sections.Text))
                 {
-                    list.Add(Formater.KEEP_SECTIONS);
+                    list.Add(SectionScreen.KEEP_SECTIONS);
                     list.AddRange(this.ASB_Keep_Sections.Text.Split(';'));
                 }
 
                 if (this.CB_MatchCase.IsChecked ?? false)
                 {
-                    list.Add(Formater.MATCH_CASE);
-                }
-
-                if (this.CB_IntAct.IsChecked ?? false)
-                {
-                    list.Add(Formater.KEEP_SECTION_INTACT);
+                    list.Add(SectionScreen.MATCH_CASE);
                 }
 
                 var sb = new StringBuilder().AppendJoin(' ', list).ToString();

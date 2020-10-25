@@ -63,12 +63,11 @@ namespace Star.Project.GUI
             if ((select.Tag as Type) == lastSelected) return;
             if (args.IsSettingsSelected)
             {
-                this.contentFrame.Navigate(lastSelected = typeof(SettingsPage));
+                this.ContentFrame.Navigate(lastSelected = typeof(SettingsPage));
             }
             else
             {
-                sender.Header = select.Content;
-                this.contentFrame.Navigate(lastSelected = (select.Tag as Type));
+                this.ContentFrame.Navigate(lastSelected = (select.Tag as Type));
                 this.LoadTemplate((select.Tag as Type).Name);
             }
         }
@@ -96,7 +95,7 @@ namespace Star.Project.GUI
 
         private void TemplateItem_Click(object sender, RoutedEventArgs e)
         {
-            switch (contentFrame.Content)
+            switch (ContentFrame.Content)
             {
                 case IToolPage page:
                     var btn = sender as Button;
@@ -108,7 +107,7 @@ namespace Star.Project.GUI
         {
             var dir = new DirectoryInfo(Path.Combine("Template", ((this.NavControl.SelectedItem as NavigationViewItem).Tag as Type).Name));
             if (!dir.Exists) dir.Create();
-            if (this.contentFrame.Content is IToolPage page)
+            if (this.ContentFrame.Content is IToolPage page)
             {
                 var tb = new AutoSuggestBox
                 {
@@ -140,7 +139,7 @@ namespace Star.Project.GUI
 
         private void RunButton_Click(object sender, RoutedEventArgs e)
         {
-            switch (contentFrame.Content)
+            switch (ContentFrame.Content)
             {
                 case IToolPage page:
                     page.Start(sender as Button, e);
