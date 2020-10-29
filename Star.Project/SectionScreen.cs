@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.CommandLine.IO;
 using System.CommandLine.Parsing;
 using System.IO;
 using System.Linq;
@@ -57,13 +58,13 @@ namespace Star.Project
             options.MatchCase = parseResult.ValueForOption<bool>(MATCH_CASE);
 
 
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t源文件: {source}");
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t目标文件: {target}");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t源文件: {source}");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t目标文件: {target}");
             if (options.Sections is null)
-                console.Out.Write($"[{DateTime.Now:O}]Debug\t保留节: NULL");
+                console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t保留节: NULL");
             else
-                console.Out.Write($"[{DateTime.Now:O}]Debug\t保留节: [{string.Join(", ", options.Sections)}]");
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t区分大小写: {options.MatchCase}");
+                console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t保留节: [{string.Join(", ", options.Sections)}]");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t区分大小写: {options.MatchCase}");
 
             await ScreeningAsync(options, console);
         }
@@ -76,7 +77,7 @@ namespace Star.Project
                 // 0. 判断程序是否具备执行条件
                 if ((options.Sections is null || options.Sections.Length < 1))// 未设置目标键或目标键为空
                 {
-                    console.Error.Write($"{nameof(options.Sections)} are NULL or Empty");
+                    console.Error.WriteLine($"{nameof(options.Sections)} are NULL or Empty");
                     return;
                 }
 
@@ -92,7 +93,7 @@ namespace Star.Project
             }
             finally
             {
-                console.Out.Write("All Done!");
+                console.Out.WriteLine("All Done!");
             }
         }
 

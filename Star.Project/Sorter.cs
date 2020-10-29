@@ -101,26 +101,26 @@ namespace Star.Project
             options.KeyConstraint = parseResult.ValueForOption<string>(CONSTRAINT_KEY);
             options.ValueConstraint = parseResult.ValueForOption<string>(CONSTRAINT_VALUE);
 
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t源文件: {source}");
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t目标文件: {target}");
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t起始数字: {options.First}");
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t长度限制: {options.Digit}");
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t输出前缀: {options.Prefix}");
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t前缀键: {options.PrefixKey}");
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t重新排序: {options.Sort}");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t源文件: {source}");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t目标文件: {target}");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t起始数字: {options.First}");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t长度限制: {options.Digit}");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t输出前缀: {options.Prefix}");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t前缀键: {options.PrefixKey}");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t重新排序: {options.Sort}");
             if (options.SortTargetKeys is null)
-                console.Out.Write($"[{DateTime.Now:O}]Debug\t排序依据键: NULL");
+                console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t排序依据键: NULL");
             else
-                console.Out.Write($"[{DateTime.Now:O}]Debug\t排序依据键: [{string.Join(", ", options.SortTargetKeys)}]");
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t输出节名: {options.OutputSection}");
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t注释键名: {options.SummaryKey}");
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t键约束: {options.KeyConstraint}");
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t值约束: {options.ValueConstraint}");
+                console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t排序依据键: [{string.Join(", ", options.SortTargetKeys)}]");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t输出节名: {options.OutputSection}");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t注释键名: {options.SummaryKey}");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t键约束: {options.KeyConstraint}");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t值约束: {options.ValueConstraint}");
 
 
-            console.Out.Write($"[{DateTime.Now:O}]Info\t开始");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Info\t开始");
             await WorkAsync(options, console);
-            console.Out.Write($"[{DateTime.Now:O}]Info\t完成");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Info\t完成");
         }
 
         public static async Task WorkAsync(SortSectionOptions options, IConsole console)
@@ -132,36 +132,36 @@ namespace Star.Project
 
             if (!string.IsNullOrEmpty(options.KeyConstraint))
             {
-                console.Out.Write($"[{DateTime.Now:O}]Info\t已启用键约束");
+                console.Out.WriteLine($"[{DateTime.Now:O}]Info\t已启用键约束");
                 if (!string.IsNullOrEmpty(options.ValueConstraint))
                 {
-                    console.Out.Write($"[{DateTime.Now:O}]Info\t已启用值约束");
+                    console.Out.WriteLine($"[{DateTime.Now:O}]Info\t已启用值约束");
                     Result = ini.Sections.Where(i => i.TryGetKey(options.KeyConstraint)?.Value.ToString().Equals(options.ValueConstraint) ?? false);
                 }
                 else
                 {
-                    console.Out.Write($"[{DateTime.Now:O}]Info\t已启用键约束, 但未启用值约束");
+                    console.Out.WriteLine($"[{DateTime.Now:O}]Info\t已启用键约束, 但未启用值约束");
                     Result = ini.Sections.Where(i => i.TryGetKey(options.KeyConstraint, out _));
                 }
             }
             if (options.Sort)
             {
-                console.Out.Write($"[{DateTime.Now:O}]Info\t已启用排序");
+                console.Out.WriteLine($"[{DateTime.Now:O}]Info\t已启用排序");
                 if (options.SortTargetKeys is null)
                 {
-                    console.Out.Write($"[{DateTime.Now:O}]Warn\t排序列表不存在, 将按Section名排序");
+                    console.Out.WriteLine($"[{DateTime.Now:O}]Warn\t排序列表不存在, 将按Section名排序");
                     Result = Result.OrderBy(i => i.Name);
                 }
                 if (options.SortTargetKeys.Length > 0)
                 {
-                    console.Out.Write($"[{DateTime.Now:O}]Info\t排序列表为空, 将按Section名排序");
+                    console.Out.WriteLine($"[{DateTime.Now:O}]Info\t排序列表为空, 将按Section名排序");
                     Result = Result.OrderBy(i => i.Name);
                 }
                 else
                 {
                     foreach (var key in options.SortTargetKeys)
                     {
-                        console.Out.Write($"[{DateTime.Now:O}]Trace\t正在根据键 {key} 的值排序");
+                        console.Out.WriteLine($"[{DateTime.Now:O}]Trace\t正在根据键 {key} 的值排序");
                         Result = Result.Where(i => i.TryGetKey(key, out _)).OrderBy(i => i.TryGetKey(key)?.Value.ToString());
                     }
                 }
@@ -201,15 +201,15 @@ namespace Star.Project
                     result.Add(new IniKeyValuePair(key, value, summary));
                 }
 
-            console.Out.Write($"[{DateTime.Now:O}]Info\t输出结果");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Info\t输出结果");
             if (!string.IsNullOrEmpty(options.OutputSection))
             {
-                console.Out.Write($"[{options.OutputSection}]");
+                console.Out.WriteLine($"[{options.OutputSection}]");
                 await options.Output?.WriteAsync($"[{options.OutputSection}]");
             }
             foreach (var item in result)
             {
-                console.Out.Write(item.ToString());
+                console.Out.WriteLine(item.ToString());
                 await options.Output?.WriteAsync(item.ToString());
             }
             await options.Output?.FlushAsync();

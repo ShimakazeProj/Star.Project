@@ -9,7 +9,7 @@ namespace Star.Project
     {
         public static async Task Main(string[] args)
         {
-            await RootCommand.InvokeAsync(args, new SystemConsole());
+            await RootCommand.InvokeAsync(args, new Data.SystemConsole());
         }
         public static RootCommand RootCommand
         {

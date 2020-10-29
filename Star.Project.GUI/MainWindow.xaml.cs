@@ -146,6 +146,10 @@ namespace Star.Project.GUI
                     break;
             }
         }
-
+        public IntPtr GetHandle(UIElement element)
+        {
+            var a = ((System.Windows.Interop.HwndSource)PresentationSource.FromVisual(element));//.Handle
+            return a.Handle;
+        }
     }
 }

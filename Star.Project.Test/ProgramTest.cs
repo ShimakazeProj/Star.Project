@@ -14,7 +14,7 @@ namespace Star.Project.Test
         {
             await Program.RootCommand.InvokeAsync("/?");
             Console.WriteLine(new string('-', 30));
-            await Program.RootCommand.InvokeAsync(Formater.NAME + " /?");
+            await Program.RootCommand.InvokeAsync(SectionScreen.NAME + " /?");
             Console.WriteLine(new string('-', 30));
             await Program.RootCommand.InvokeAsync(Sorter.NAME + " /?");
         }

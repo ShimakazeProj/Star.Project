@@ -104,10 +104,7 @@ namespace Star.Project.GUI
 
                 var sb = new StringBuilder().AppendJoin(' ', list).ToString();
 
-                var output = new ConsoleOutputDialog();
-                var dialogResultTask = output.ShowAsync();
-                await Program.RootCommand.InvokeAsync(sb, new RichTextBoxConsole(output.consoleOutput));
-                await dialogResultTask;
+                _ = new ConsoleOutputDialog(sb).ShowAsync();
             }
             finally
             {

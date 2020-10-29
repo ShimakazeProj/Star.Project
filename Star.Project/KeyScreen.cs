@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.CommandLine.IO;
 using System.CommandLine.Parsing;
 using System.IO;
 using System.Linq;
@@ -58,52 +59,51 @@ namespace Star.Project
             options.MatchCase = parseResult.ValueForOption<bool>(MATCH_CASE);
 
 
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t源文件: {source}");
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t目标文件: {target}");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t源文件: {source}");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t目标文件: {target}");
             if (options.Keys is null)
-                console.Out.Write($"[{DateTime.Now:O}]Debug\t保留键: NULL");
+                console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t保留键: NULL");
             else
-                console.Out.Write($"[{DateTime.Now:O}]Debug\t保留键: [{string.Join(", ", options.Keys)}]");
+                console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t保留键: [{string.Join(", ", options.Keys)}]");
 
-            console.Out.Write($"[{DateTime.Now:O}]Debug\t区分大小写: {options.MatchCase}");
+            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t区分大小写: {options.MatchCase}");
 
             await ScreeningAsync(options, console);
         }
 
         public static async Task ScreeningAsync(KeyScreenOptions options, IConsole console)
         {
-            IniDocument ini, result;
+            IniDocument result;
+            var iniTask = IniDocument.ParseAsync(options.Input);
             try
             {
                 // 0. 判断程序是否具备执行条件
                 if (options.Keys is null || options.Keys.Length < 1)// 未设置目标节或目标节为空
                 {
-                    console.Error.Write($"{nameof(options.Keys)} are NULL or Empty");
+                    console.Error.WriteLine($"{nameof(options.Keys)} are NULL or Empty");
                     return;
                 }
 
-                // 1. 读入文件
-                ini = await IniDocument.ParseAsync(options.Input);
                 var comparer = options.MatchCase ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
 
                 // 2. 筛选并保留目标键
                 var targetSectionsDictionary = new Dictionary<(string name, string summary), List<IniKeyValuePair>>();
-                Parallel.ForEach(ini.Sections, section =>// 遍历节内容
+                foreach (var section in (await iniTask).Sections)// 遍历节内容
                 {
-                    Parallel.ForEach(section.Content, keyValuePair => // 遍历键内容
+                    console.Out.WriteLine($"[{DateTime.Now:O}]Trace\t正在遍历节[{section.Name}]");
+                    foreach (var keyValuePair in section.Content)// 遍历键内容
                     {
                         if (keyValuePair.HasData && options.Keys.Contains(keyValuePair.Key, comparer))// 存在有效数据
                         {
-                            lock (targetSectionsDictionary)
-                            {
-                                if (targetSectionsDictionary.TryGetValue((section.Name, section.Summary), out var targetSection))// 尝试从字典中获取目标节
-                                    targetSection.Add(keyValuePair);
-                                else// 找不到目标节
-                                    targetSectionsDictionary.Add((section.Name, section.Summary), new List<IniKeyValuePair> { keyValuePair });
-                            }
+                            console.Out.WriteLine($"[{DateTime.Now:O}]Trace\t找到键[{keyValuePair.Key}]");
+
+                            if (targetSectionsDictionary.TryGetValue((section.Name, section.Summary), out var targetSection))// 尝试从字典中获取目标节
+                                targetSection.Add(keyValuePair);
+                            else// 找不到目标节
+                                targetSectionsDictionary.Add((section.Name, section.Summary), new List<IniKeyValuePair> { keyValuePair });
                         }
-                    });
-                });
+                    }
+                }
                 var targetSections = new List<IniSection>(targetSectionsDictionary.Count);
                 Parallel.ForEach(targetSectionsDictionary, kvp => targetSections.Add(new IniSection(kvp.Key.name, kvp.Key.summary, kvp.Value.ToArray())));
                 // 输出
@@ -112,7 +112,7 @@ namespace Star.Project
             }
             finally
             {
-                console.Out.Write("All Done!");
+                console.Out.WriteLine($"[{DateTime.Now:O}]Info\tAll Done!");
             }
         }
         public struct KeyScreenOptions

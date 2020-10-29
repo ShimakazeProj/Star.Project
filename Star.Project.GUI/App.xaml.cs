@@ -13,5 +13,8 @@ namespace Star.Project.GUI
     /// </summary>
     public partial class App : Application
     {
+        //public App() => Data.ConsoleHelper.AllocConsole();
+        //~App() => Data.ConsoleHelper.FreeConsole();
+
     }
 }

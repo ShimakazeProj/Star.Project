@@ -11,17 +11,17 @@ namespace Star.Project.Test
         [TestMethod]
         public async Task CleannerCommandTest()
         {
-            await Program.RootCommand.InvokeAsync($"{Formater.NAME}");
+            await Program.RootCommand.InvokeAsync($"{SectionScreen.NAME}");
+            await Program.RootCommand.InvokeAsync($"{KeyScreen.NAME}");
         }
 
         [TestMethod("指定目标键测试")]
         public async Task CleannerKeysTest()
         {
             await Program.RootCommand.InvokeAsync(
-                $"{Formater.NAME} " +
-                $"{Formater.FILE_INPUT} {@"C:\Users\Shimakaze\Desktop\aaa.txt"} " +
-                $"{Formater.FILE_OUTPUT} {@"C:\Users\Shimakaze\Desktop\aaa.new.txt"} " +
-                $"{Formater.KEEP_KEYS} q c a");
+                $"{SectionScreen.NAME} " +
+                $"{SectionScreen.FILE_INPUT} {@"C:\Users\Shimakaze\Desktop\aaa.txt"} " +
+                $"{SectionScreen.FILE_OUTPUT} {@"C:\Users\Shimakaze\Desktop\aaa.new.txt"} ");
         }
     }
 }

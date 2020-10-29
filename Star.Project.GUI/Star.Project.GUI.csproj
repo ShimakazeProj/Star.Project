@@ -21,4 +21,10 @@
     <ProjectReference Include="..\Star.Project\Star.Project.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Controls\WindowControl.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>

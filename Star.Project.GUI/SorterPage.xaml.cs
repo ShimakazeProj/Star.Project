@@ -15,6 +15,7 @@ using ModernWpf.Controls;
 
 using Shimakaze.Struct.Ini;
 
+using Star.Project.Data;
 using Star.Project.GUI.Data;
 
 namespace Star.Project.GUI
@@ -196,10 +197,8 @@ namespace Star.Project.GUI
 
                 var sb = new StringBuilder().AppendJoin(' ', list).ToString();
 
-                var output = new ConsoleOutputDialog();
-                var dialogResultTask = output.ShowAsync();
-                await Program.RootCommand.InvokeAsync(sb, new RichTextBoxConsole(output.consoleOutput));
-                await dialogResultTask;
+                _ = new ConsoleOutputDialog(sb).ShowAsync();
+
             }
 #if !DEBUG
             catch (Exception ex)
