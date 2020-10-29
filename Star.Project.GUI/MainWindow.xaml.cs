@@ -71,26 +71,39 @@ namespace Star.Project.GUI
                 this.LoadTemplate((select.Tag as Type).Name);
             }
         }
-
         private async void LoadTemplate(string name)
         {
-            var dir = new DirectoryInfo(Path.Combine("Template", name));
-            if (dir.Exists)
+            await this.templates.Dispatcher.InvokeAsync(() =>
             {
-                var files = dir.GetFiles();
+                while (this.templates.SecondaryCommands[2] is AppBarButton)
+                    this.templates.SecondaryCommands.RemoveAt(2);
+            });
+            var dir = new DirectoryInfo(Path.Combine("Template", name));
 
-                for (int i = 0; i < files.Length; i++)
+            if (!dir.Exists) goto NoTemplate;
+            var files = dir.GetFiles();
+            if (files.Length == 0) goto NoTemplate;
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                var btn = new AppBarButton
                 {
-                    var btn = new AppBarButton
-                    {
-                        Label = files[i].Name,
-                        Icon = new SymbolIcon(Symbol.ImportAll),
-                        Tag = files[i]
-                    };
-                    btn.Click += this.TemplateItem_Click;
-                    await this.templates.Dispatcher.InvokeAsync(() => this.templates.SecondaryCommands.Insert(i + 2, btn));
+                    Label = files[i].Name,
+                    Icon = new SymbolIcon(Symbol.ImportAll),
+                    Tag = files[i]
                 };
+                btn.Click += this.TemplateItem_Click;
+                await this.templates.Dispatcher.InvokeAsync(() => this.templates.SecondaryCommands.Insert(i + 2, btn));
             }
+            return;
+
+        NoTemplate:
+            await this.templates.Dispatcher.InvokeAsync(() => this.templates.SecondaryCommands.Insert(2, new AppBarButton
+            {
+                Label = "暂无保存的模板",
+                Icon = new SymbolIcon(Symbol.Cancel),
+                IsEnabled = false
+            }));
         }
 
         private void TemplateItem_Click(object sender, RoutedEventArgs e)
@@ -128,13 +141,33 @@ namespace Star.Project.GUI
                         break;
                     case ContentDialogResult.Primary:
                         if (string.IsNullOrEmpty(tb.Text.Trim())) goto ShowDialog;
-                        page.SaveTemplate(sender as Button, new FileInfo(Path.Combine(dir.FullName, tb.Text.Trim())));
+                        if (this.templates.SecondaryCommands[2] is AppBarButton btn && !btn.IsEnabled)
+                            await this.templates.Dispatcher.InvokeAsync(() => this.templates.SecondaryCommands.RemoveAt(2));
+                        var file = new FileInfo(Path.Combine(dir.FullName, tb.Text.Trim()));
+                        page.SaveTemplate(sender as Button, file);
+
+                        btn = new AppBarButton
+                        {
+                            Label = file.Name,
+                            Icon = new SymbolIcon(Symbol.ImportAll),
+                            Tag = file
+                        };
+                        btn.Click += this.TemplateItem_Click;
+                        await this.templates.Dispatcher.InvokeAsync(() => this.templates.SecondaryCommands.Insert(this.templates.SecondaryCommands.Count - 2, btn));
+
                         break;
                     case ContentDialogResult.Secondary:
                         break;
                 }
             }
 
+        }
+
+        private async void TemplateManager_Click(object sender, RoutedEventArgs e)
+        {
+            await new TemplateManagerDialog(this.templates.SecondaryCommands.Where(i => i is AppBarButton btn && btn.Tag is FileInfo)
+                                                                            .Select(i => (i as AppBarButton).Tag as FileInfo)).ShowAsync();
+            this.LoadTemplate(this.ContentFrame.Content.GetType().Name);
         }
 
         private void RunButton_Click(object sender, RoutedEventArgs e)
@@ -146,10 +179,6 @@ namespace Star.Project.GUI
                     break;
             }
         }
-        public IntPtr GetHandle(UIElement element)
-        {
-            var a = ((System.Windows.Interop.HwndSource)PresentationSource.FromVisual(element));//.Handle
-            return a.Handle;
-        }
+
     }
 }

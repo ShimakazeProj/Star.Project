@@ -73,7 +73,7 @@
                                             <ui:AppBarSeparator />
 
                                             <ui:AppBarSeparator />
-                                            <ui:AppBarButton Label="编辑模板列表">
+                                            <ui:AppBarButton Label="编辑模板列表" Click="TemplateManager_Click">
                                                 <ui:AppBarButton.Icon>
                                                     <ui:SymbolIcon Symbol="Edit" />
                                                 </ui:AppBarButton.Icon>
