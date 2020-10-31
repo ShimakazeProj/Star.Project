@@ -2,6 +2,10 @@
 <DOCUMENT Type="Advanced Installer" CreateVersion="17.6" version="17.6" Modules="architect" RootPath="." Language="zh" Id="{4E72997E-DB67-4C9A-B2E0-ABB899B5CFEA}">
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
+    <ROW Property="AI_CLEAN_RESOURCES_DISABLE_UPGRADE" Value="1"/>
+    <ROW Property="AI_CLEAN_RESOURCES_UNINSTALL" Value="1"/>
+    <ROW Property="AI_CLEAN_RESOURCES_USER_PROMPT_BASIC_UI" Value="0"/>
+    <ROW Property="AI_CLEAN_RESOURCES_USER_PROMPT_FULL_UI" Value="0"/>
     <ROW Property="AI_COLOR_DISABLED_TEXT" Value="3026478" MsiKey="AI_COLOR_DISABLED_TEXT"/>
     <ROW Property="AI_CONTROL_VISUAL_STYLE" Value="2960685;4276545;6776679;16176031" MsiKey="AI_CONTROL_VISUAL_STYLE"/>
     <ROW Property="AI_CONTROL_VISUAL_STYLE_EX" Value="1513239;3026478;3026478" MsiKey="AI_CONTROL_VISUAL_STYLE_EX"/>
@@ -12,6 +16,26 @@
     <ROW Property="AI_NO_BORDER_NORMAL" MultiBuildValue="DefaultBuild:1" MsiKey="AI_NO_BORDER_NORMAL"/>
     <ROW Property="AI_PREDEF_LCONDS_PROPS" Value="AI_DETECTED_DOTNET_CORE_VERSION"/>
     <ROW Property="AI_PRODUCTNAME_ARP" Value="Star Project"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_Shimakaze.Struct.Ini.dll_1" Value="C:\Users\Shimakaze\.nuget\packages\shimakaze.struct.ini\1.0.5-preview\lib\netstandard2.0"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_Star.Project.GUI.dll_1" Value="..\Star.Project.GUI\bin\Release\netcoreapp3.1"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_Star.Project.GUI.exe_1" Value="..\Star.Project.GUI\bin\Release\netcoreapp3.1"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_Star.Project.GUI.pdb_1" Value="..\Star.Project.GUI\bin\Release\netcoreapp3.1"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_Star.Project.GUI.runtimeconfig.json_1" Value="..\Star.Project.GUI\bin\Release\netcoreapp3.1"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_Star.Project.dll_1" Value="..\Star.Project\bin\Release\netcoreapp3.1"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_Star.Project.exe_1" Value="..\Star.Project.GUI\bin\Release\netcoreapp3.1"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_Star.Project.pdb_1" Value="..\Star.Project\bin\Release\netcoreapp3.1"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_Star.Project.runtimeconfig.json_1" Value="..\Star.Project\bin\Release\netcoreapp3.1"/>
+    <ROW Property="AI_PROPPATH_DIR_PERBUILD_System.CommandLine.dll_1" Value="C:\Users\Shimakaze\.nuget\packages\system.commandline\2.0.0-beta1.20371.2\lib\netstandard2.0"/>
+    <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_Shimakaze.Struct.Ini.dll_1" Value="Shimakaze.Struct.Ini.dll"/>
+    <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.dll_1" Value="Star.Project.GUI.dll"/>
+    <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.exe_1" Value="Star.Project.GUI.exe"/>
+    <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.pdb_1" Value="Star.Project.GUI.pdb"/>
+    <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.runtimeconfig.json_1" Value="Star.Project.GUI.runtimeconfig.json"/>
+    <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.dll_1" Value="Star.Project.dll"/>
+    <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.exe_1" Value="Star.Project.exe"/>
+    <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.pdb_1" Value="Star.Project.pdb"/>
+    <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.runtimeconfig.json_1" Value="Star.Project.runtimeconfig.json"/>
+    <ROW Property="AI_PROPPATH_FILENAME_PERBUILD_System.CommandLine.dll_1" Value="System.CommandLine.dll"/>
     <ROW Property="AI_REQUIRED_DOTNET_CORE_DISPLAY" MultiBuildValue="DefaultBuild:3.1" ValueLocId="-"/>
     <ROW Property="AI_REQUIRED_DOTNET_CORE_VERSION" MultiBuildValue="DefaultBuild:3.1" ValueLocId="-"/>
     <ROW Property="AI_ThemeStyle" Value="default" MsiKey="AI_ThemeStyle"/>
@@ -19,6 +43,7 @@
     <ROW Property="AI_UNINSTALLER" Value="msiexec.exe"/>
     <ROW Property="ALLUSERS" Value="1" MultiBuildValue="DefaultBuild:2"/>
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
+    <ROW Property="ARPNOMODIFY" MultiBuildValue="DefaultBuild:1"/>
     <ROW Property="ARPNOREPAIR" Value="1" MultiBuildValue="DefaultBuild:1"/>
     <ROW Property="ARPPRODUCTICON" Value="Shimakaze.exe" Type="8"/>
     <ROW Property="ARPSYSTEMCOMPONENT" Value="1"/>
@@ -54,50 +79,63 @@
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
-    <ROW Component="AI_CustomARPName" ComponentId="{97B3F96E-7FEC-49CE-9326-B2CE501758A5}" Directory_="APPDIR" Attributes="4" KeyPath="DisplayName" Options="1"/>
+    <ROW Component="AI_CustomARPName" ComponentId="{893D2DBB-8F73-46A2-BD45-E1864040B749}" Directory_="APPDIR" Attributes="4" KeyPath="DisplayName" Options="1"/>
+    <ROW Component="AI_DisableModify" ComponentId="{6CE4C2B8-D1CC-4DCF-80A2-683204721C5F}" Directory_="APPDIR" Attributes="4" KeyPath="NoModify" Options="1"/>
     <ROW Component="AI_ExePath" ComponentId="{DB9E2205-9DA3-4C1D-BA85-50969832E849}" Directory_="APPDIR" Attributes="4" KeyPath="AI_ExePath"/>
     <ROW Component="AI_INSTALLPERUSER" ComponentId="{44DCCD31-E4A8-4D11-A7D4-F0AA48E68F22}" Directory_="APPDIR" Attributes="4" KeyPath="AI_INSTALLPERUSER" Options="1"/>
+    <ROW Component="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.dll_1" ComponentId="{2620C885-8E9C-481E-874F-5FBEB4216A38}" Directory_="APPDIR" Attributes="0" KeyPath="Star.Project.GUI.dll_1"/>
+    <ROW Component="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.exe_1_1" ComponentId="{889EB1AE-AC35-45C8-9AEE-D4BF7D100D95}" Directory_="APPDIR" Attributes="256" KeyPath="Star.Project.GUI.exe_1"/>
+    <ROW Component="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.pdb_1" ComponentId="{26A36BA6-B9E1-4EF7-AAD9-2D727FDDF031}" Directory_="APPDIR" Attributes="0" KeyPath="Star.Project.GUI.pdb_1"/>
+    <ROW Component="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.runtimeconfig.json_1" ComponentId="{B2CE47C6-A3D3-494B-B304-C3CE9FF195C8}" Directory_="APPDIR" Attributes="0" KeyPath="Star.Project.GUI.runtimeconfig.json_1"/>
+    <ROW Component="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.dll_1" ComponentId="{E1761754-56EE-427E-B0E7-7DCA4B4D0803}" Directory_="APPDIR" Attributes="0" KeyPath="Star.Project.dll_1"/>
+    <ROW Component="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.pdb_1" ComponentId="{E8997B1E-7C23-4ABF-B346-A97681993FB8}" Directory_="APPDIR" Attributes="0" KeyPath="Star.Project.pdb_1"/>
     <ROW Component="APPDIR" ComponentId="{92F01C5A-3196-4060-B6F3-EA54F22652E9}" Directory_="APPDIR" Attributes="0"/>
     <ROW Component="ModernWpf.Controls.dll" ComponentId="{2CDBD2AC-8284-44CA-B006-A9C1ABF42FEA}" Directory_="APPDIR" Attributes="0" KeyPath="ModernWpf.Controls.dll"/>
     <ROW Component="ModernWpf.dll" ComponentId="{5D6D9AE4-4174-406D-B59F-04EF46AD9613}" Directory_="APPDIR" Attributes="0" KeyPath="ModernWpf.dll"/>
     <ROW Component="ProductInformation" ComponentId="{41F176CE-A86A-4040-9D08-057FB6C7E015}" Directory_="APPDIR" Attributes="4" KeyPath="Version"/>
-    <ROW Component="Shimakaze.Struct.Ini.dll" ComponentId="{93055450-2FEC-4D4B-805C-8C0BD45FF918}" Directory_="APPDIR" Attributes="0" KeyPath="Shimakaze.Struct.Ini.dll"/>
-    <ROW Component="Star.Project.GUI.dll" ComponentId="{AEB6C7E9-8B0E-40A8-8D26-30396A5BC7B0}" Directory_="APPDIR" Attributes="0" KeyPath="Star.Project.GUI.dll"/>
-    <ROW Component="Star.Project.GUI.exe" ComponentId="{5780E7C2-1977-477F-9705-43E1CB670F83}" Directory_="APPDIR" Attributes="256" KeyPath="Star.Project.GUI.pdb"/>
-    <ROW Component="Star.Project.GUI.exe_1" ComponentId="{3C812FCC-F1EB-4933-A3B9-4B0B49274BC5}" Directory_="APPDIR" Attributes="256" KeyPath="Star.Project.GUI.exe"/>
-    <ROW Component="Star.Project.GUI.runtimeconfig.json" ComponentId="{6B14A39E-5BD2-478E-AC3F-B1313EAD2CF1}" Directory_="APPDIR" Attributes="0" KeyPath="Star.Project.GUI.runtimeconfig.json" Type="0"/>
-    <ROW Component="Star.Project.dll" ComponentId="{166827F1-B710-468E-912F-1A11C60DE0EB}" Directory_="APPDIR" Attributes="0" KeyPath="Star.Project.dll"/>
-    <ROW Component="Star.Project.exe" ComponentId="{31B28200-C408-4DF1-BC0D-DF09EF65F028}" Directory_="APPDIR" Attributes="256" KeyPath="Star.Project.exe"/>
-    <ROW Component="Star.Project.pdb" ComponentId="{E64AEB5A-CACC-4364-AE0D-C8E5E52CD433}" Directory_="APPDIR" Attributes="0" KeyPath="Star.Project.pdb" Type="4"/>
-    <ROW Component="Star.Project.runtimeconfig.json" ComponentId="{5051C901-C6CF-4F11-A8A2-BA8E463172AA}" Directory_="APPDIR" Attributes="0" KeyPath="Star.Project.runtimeconfig.json" Type="0"/>
+    <ROW Component="Star.Project.runtimeconfig.json" ComponentId="{5051C901-C6CF-4F11-A8A2-BA8E463172AA}" Directory_="APPDIR" Attributes="0" KeyPath="Shimakaze.Struct.Ini.dll_1" Type="0"/>
     <ROW Component="StarProject" ComponentId="{98F2BDF9-C0F2-4F94-B525-F70C6DEAC9AB}" Directory_="StarProject_Dir" Attributes="0"/>
-    <ROW Component="System.CommandLine.dll" ComponentId="{30F19D1A-255D-4542-8062-7DB9FFB7A44F}" Directory_="APPDIR" Attributes="0" KeyPath="System.CommandLine.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
     <ROW Feature="Star.Project" Title="主程序" Description="主程序安装" Display="1" Level="1" Directory_="APPDIR" Attributes="0"/>
     <ROW Feature="Star.Project.CLI.pdb" Feature_Parent="Star.Project" Title="符号文件" Description="安装CLI工具的调试符号" Display="4" Level="1" Directory_="APPDIR" Attributes="0"/>
     <ROW Feature="Star.Project.GUI" Feature_Parent="Star.Project" Title="图形界面" Description="安装图形界面工具" Display="7" Level="1" Directory_="APPDIR" Attributes="0"/>
-    <ROW Feature="Star.Project.GUI.Link" Feature_Parent="Star.Project.Link" Title="GUI快捷方式" Description="包括GUI应用快捷方式" Display="9" Level="1" Directory_="APPDIR" Attributes="0"/>
+    <ROW Feature="Star.Project.GUI.Link" Feature_Parent="Star.Project.Link" Title="图形用户界面快捷方式" Description="包括图形界面应用快捷方式" Display="9" Level="1" Directory_="APPDIR" Attributes="0"/>
     <ROW Feature="Star.Project.GUI.pdb" Feature_Parent="Star.Project.CLI.pdb" Title="图形界面符号文件" Description="包括调试符号" Display="3" Level="1" Directory_="APPDIR" Attributes="0"/>
     <ROW Feature="Star.Project.Link" Title="开始菜单快捷方式" Description="创建开始菜单快捷方式" Display="7" Level="1" Directory_="APPDIR" Attributes="0"/>
     <ATTRIBUTE name="CurrentFeature" value="Star.Project"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
-    <ROW File="Star.Project.GUI.dll" Component_="Star.Project.GUI.dll" FileName="STARPR~1.DLL|Star.Project.GUI.dll" Attributes="0" SourcePath="..\Star.Project.GUI\bin\Release\netcoreapp3.1\Star.Project.GUI.dll" SelfReg="false"/>
-    <ROW File="Star.Project.GUI.exe" Component_="Star.Project.GUI.exe_1" FileName="STARPR~1.EXE|Star.Project.GUI.exe" Attributes="0" SourcePath="..\Star.Project.GUI\bin\Release\netcoreapp3.1\Star.Project.GUI.exe" SelfReg="false" DigSign="true"/>
-    <ROW File="Star.Project.GUI.pdb" Component_="Star.Project.GUI.exe" FileName="STARPR~1.PDB|Star.Project.GUI.pdb" Attributes="0" SourcePath="..\Star.Project.GUI\bin\Release\netcoreapp3.1\Star.Project.GUI.pdb" SelfReg="false"/>
-    <ROW File="Star.Project.GUI.runtimeconfig.json" Component_="Star.Project.GUI.runtimeconfig.json" FileName="STARPR~1.JSO|Star.Project.GUI.runtimeconfig.json" Attributes="0" SourcePath="..\Star.Project.GUI\bin\Release\netcoreapp3.1\Star.Project.GUI.runtimeconfig.json" SelfReg="false"/>
     <ROW File="ModernWpf.Controls.dll" Component_="ModernWpf.Controls.dll" FileName="MODERN~1.DLL|ModernWpf.Controls.dll" Attributes="0" SourcePath="..\Star.Project.GUI\bin\Release\netcoreapp3.1\ModernWpf.Controls.dll" SelfReg="false"/>
     <ROW File="ModernWpf.dll" Component_="ModernWpf.dll" FileName="MODERN~2.DLL|ModernWpf.dll" Attributes="0" SourcePath="..\Star.Project.GUI\bin\Release\netcoreapp3.1\ModernWpf.dll" SelfReg="false"/>
-    <ROW File="Star.Project.runtimeconfig.json" Component_="Star.Project.runtimeconfig.json" FileName="STARPR~2.JSO|Star.Project.runtimeconfig.json" Attributes="0" SourcePath="..\Star.Project\bin\Release\netcoreapp3.1\Star.Project.runtimeconfig.json" SelfReg="false"/>
-    <ROW File="System.CommandLine.dll" Component_="System.CommandLine.dll" FileName="SYSTEM~1.DLL|System.CommandLine.dll" Attributes="0" SourcePath="..\Star.Project\bin\Release\netcoreapp3.1\System.CommandLine.dll" SelfReg="false"/>
-    <ROW File="Shimakaze.Struct.Ini.dll" Component_="Shimakaze.Struct.Ini.dll" FileName="SHIMAK~1.DLL|Shimakaze.Struct.Ini.dll" Attributes="0" SourcePath="..\Star.Project\bin\Release\netcoreapp3.1\Shimakaze.Struct.Ini.dll" SelfReg="false"/>
-    <ROW File="Star.Project.dll" Component_="Star.Project.dll" FileName="STARPR~2.DLL|Star.Project.dll" Attributes="0" SourcePath="..\Star.Project\bin\Release\netcoreapp3.1\Star.Project.dll" SelfReg="false"/>
-    <ROW File="Star.Project.exe" Component_="Star.Project.exe" FileName="STARPR~2.EXE|Star.Project.exe" Attributes="0" SourcePath="..\Star.Project\bin\Release\netcoreapp3.1\Star.Project.exe" SelfReg="false" DigSign="true"/>
-    <ROW File="Star.Project.pdb" Component_="Star.Project.pdb" FileName="STARPR~2.PDB|Star.Project.pdb" Attributes="0" SourcePath="..\Star.Project\bin\Release\netcoreapp3.1\Star.Project.pdb" SelfReg="false"/>
+    <ROW File="Star.Project.GUI.dll_1" Component_="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.dll_1" FileName="STARPR~1.DLL|[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.dll_1]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_Star.Project.GUI.dll_1&gt;" SelfReg="false"/>
+    <ROW File="Star.Project.GUI.runtimeconfig.json_1" Component_="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.runtimeconfig.json_1" FileName="STARPR~1.JSO|[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.runtimeconfig.json_1]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_Star.Project.GUI.runtimeconfig.json_1&gt;" SelfReg="false"/>
+    <ROW File="Star.Project.exe_1" Component_="Star.Project.runtimeconfig.json" FileName="STARPR~2.EXE|[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.exe_1]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_Star.Project.exe_1&gt;" SelfReg="false" DigSign="true"/>
+    <ROW File="Star.Project.GUI.exe_1" Component_="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.exe_1_1" FileName="STARPR~1.EXE|[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.exe_1]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_Star.Project.GUI.exe_1&gt;" SelfReg="false" DigSign="true"/>
+    <ROW File="Star.Project.GUI.pdb_1" Component_="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.pdb_1" FileName="STARPR~1.PDB|[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.pdb_1]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_Star.Project.GUI.pdb_1&gt;" SelfReg="false"/>
+    <ROW File="Star.Project.dll_1" Component_="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.dll_1" FileName="STARPR~2.DLL|[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.dll_1]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_Star.Project.dll_1&gt;" SelfReg="false"/>
+    <ROW File="Star.Project.runtimeconfig.json_1" Component_="Star.Project.runtimeconfig.json" FileName="STARPR~2.JSO|[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.runtimeconfig.json_1]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_Star.Project.runtimeconfig.json_1&gt;" SelfReg="false"/>
+    <ROW File="Shimakaze.Struct.Ini.dll_1" Component_="Star.Project.runtimeconfig.json" FileName="SHIMAK~1.DLL|[|AI_PROPPATH_FILENAME_PERBUILD_Shimakaze.Struct.Ini.dll_1]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_Shimakaze.Struct.Ini.dll_1&gt;" SelfReg="false"/>
+    <ROW File="System.CommandLine.dll_1" Component_="Star.Project.runtimeconfig.json" FileName="SYSTEM~1.DLL|[|AI_PROPPATH_FILENAME_PERBUILD_System.CommandLine.dll_1]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_System.CommandLine.dll_1&gt;" SelfReg="false"/>
+    <ROW File="Star.Project.pdb_1" Component_="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.pdb_1" FileName="STARPR~2.PDB|[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.pdb_1]" Attributes="0" SourcePath="&lt;AI_APPPATH_PERBUILD_Star.Project.pdb_1&gt;" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AiPersistentPropComponent">
     <ROW Property="AI_INSTALLPERUSER" Registry="AI_INSTALLPERUSER" HklmSearch="AI_INSTALLPERUSER"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.AiRemoveFileComponent">
+    <ROW RemoveFile="_" Condition="(AI_CLEAN_RESOURCES_UNINSTALL = &quot;1&quot;) AND (NOT UPGRADINGPRODUCTCODE)" Options="1"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.AppPathsComponent">
+    <ROW Name="AI_APPPATH_PERBUILD_Shimakaze.Struct.Ini.dll_1" Path="[|AI_PROPPATH_DIR_PERBUILD_Shimakaze.Struct.Ini.dll_1]\[|AI_PROPPATH_FILENAME_PERBUILD_Shimakaze.Struct.Ini.dll_1]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_Star.Project.GUI.dll_1" Path="[|AI_PROPPATH_DIR_PERBUILD_Star.Project.GUI.dll_1]\[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.dll_1]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_Star.Project.GUI.exe_1" Path="[|AI_PROPPATH_DIR_PERBUILD_Star.Project.GUI.exe_1]\[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.exe_1]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_Star.Project.GUI.pdb_1" Path="[|AI_PROPPATH_DIR_PERBUILD_Star.Project.GUI.pdb_1]\[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.pdb_1]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_Star.Project.GUI.runtimeconfig.json_1" Path="[|AI_PROPPATH_DIR_PERBUILD_Star.Project.GUI.runtimeconfig.json_1]\[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.runtimeconfig.json_1]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_Star.Project.dll_1" Path="[|AI_PROPPATH_DIR_PERBUILD_Star.Project.dll_1]\[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.dll_1]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_Star.Project.exe_1" Path="[|AI_PROPPATH_DIR_PERBUILD_Star.Project.exe_1]\[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.exe_1]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_Star.Project.pdb_1" Path="[|AI_PROPPATH_DIR_PERBUILD_Star.Project.pdb_1]\[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.pdb_1]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_Star.Project.runtimeconfig.json_1" Path="[|AI_PROPPATH_DIR_PERBUILD_Star.Project.runtimeconfig.json_1]\[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.runtimeconfig.json_1]" Type="2" Content="0"/>
+    <ROW Name="AI_APPPATH_PERBUILD_System.CommandLine.dll_1" Path="[|AI_PROPPATH_DIR_PERBUILD_System.CommandLine.dll_1]\[|AI_PROPPATH_FILENAME_PERBUILD_System.CommandLine.dll_1]" Type="2" Content="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
@@ -132,6 +170,11 @@
     <ROW Fragment="VerifyRepairDlg.aip" Path="&lt;AI_THEMES&gt;surface\fragments\VerifyRepairDlg.aip"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiActionTextComponent">
+    <ROW Action="AI_AiRemoveFilesCommit" Description="正在执行文件删除操作。" DescriptionLocId="ActionText.Description.AI_AiRemoveFilesCommit" Template="正在删除文件: [1]" TemplateLocId="ActionText.Template.AI_AiRemoveFilesCommit"/>
+    <ROW Action="AI_AiRemoveFilesDeferred_Permanent" Description="正在生成删除文件操作。" DescriptionLocId="ActionText.Description.AI_AiRemoveFilesDeferred_Permanent" Template="Preparing file: [1]" TemplateLocId="ActionText.Template.AI_AiRemoveFilesDeferred_Permanent"/>
+    <ROW Action="AI_AiRemoveFilesDeferred_Undoable" Description="正在生成删除文件操作。" DescriptionLocId="ActionText.Description.AI_AiRemoveFilesDeferred_Undoable" Template="Preparing file: [1]" TemplateLocId="ActionText.Template.AI_AiRemoveFilesDeferred_Undoable"/>
+    <ROW Action="AI_AiRemoveFilesImmediate" Description="正在生成删除文件操作。" DescriptionLocId="ActionText.Description.AI_AiRemoveFilesImmediate" Template="Preparing file: [1]" TemplateLocId="ActionText.Template.AI_AiRemoveFilesImmediate"/>
+    <ROW Action="AI_AiRemoveFilesRollback" Description="恢复删除的文件" DescriptionLocId="ActionText.Description.AI_AiRemoveFilesRollback" Template="Restoring file: [1]" TemplateLocId="ActionText.Template.AI_AiRemoveFilesRollback"/>
     <ROW Action="AI_DeleteLzma" Description="正在删除从档案中提取的文件" DescriptionLocId="ActionText.Description.AI_DeleteLzma" TemplateLocId="-"/>
     <ROW Action="AI_DeleteRLzma" Description="正在删除从档案中提取的文件" DescriptionLocId="ActionText.Description.AI_DeleteLzma" TemplateLocId="-"/>
     <ROW Action="AI_ExtractFiles" Description="正在从档案中提取文件" DescriptionLocId="ActionText.Description.AI_ExtractLzma" TemplateLocId="-"/>
@@ -145,6 +188,7 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
     <ROW Name="Prereq.dll" SourcePath="&lt;AI_CUSTACTS&gt;Prereq.dll"/>
+    <ROW Name="ResourceCleaner.dll" SourcePath="&lt;AI_CUSTACTS&gt;ResourceCleaner.dll"/>
     <ROW Name="SoftwareDetector.dll" SourcePath="&lt;AI_CUSTACTS&gt;SoftwareDetector.dll"/>
     <ROW Name="aicustact.dll" SourcePath="&lt;AI_CUSTACTS&gt;aicustact.dll"/>
     <ROW Name="logo.png" SourcePath="..\logo.png"/>
@@ -280,6 +324,11 @@
     <ROW Directory_="StarProject_Dir" Component_="StarProject" ManualDelete="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
+    <ROW Action="AI_AiRemoveFilesCommit" Type="11777" Source="ResourceCleaner.dll" Target="OnAiRemoveFilesCommit" WithoutSeq="true"/>
+    <ROW Action="AI_AiRemoveFilesDeferred_Permanent" Type="11265" Source="ResourceCleaner.dll" Target="OnAiRemoveFilesPermanent" WithoutSeq="true"/>
+    <ROW Action="AI_AiRemoveFilesDeferred_Undoable" Type="11265" Source="ResourceCleaner.dll" Target="OnAiRemoveFilesUndoable" WithoutSeq="true"/>
+    <ROW Action="AI_AiRemoveFilesImmediate" Type="1" Source="ResourceCleaner.dll" Target="OnAiRemoveFilesImmediate"/>
+    <ROW Action="AI_AiRemoveFilesRollback" Type="11521" Source="ResourceCleaner.dll" Target="OnAiUndoRemoveFiles"/>
     <ROW Action="AI_AuthorSinglePackage" Type="1" Source="aicustact.dll" Target="AI_AuthorSinglePackage" WithoutSeq="true"/>
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Type="51" Source="AI_SETUPEXEPATH_ORIGINAL" Target="[AI_SETUPEXEPATH]"/>
     <ROW Action="AI_ChooseTextStyles" Type="1" Source="aicustact.dll" Target="ChooseTextStyles"/>
@@ -316,25 +365,23 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatCompsComponent">
     <ROW Feature_="Star.Project" Component_="APPDIR"/>
     <ROW Feature_="Star.Project" Component_="AI_INSTALLPERUSER"/>
-    <ROW Feature_="Star.Project" Component_="AI_CustomARPName"/>
     <ROW Feature_="Star.Project" Component_="StarProject"/>
-    <ROW Feature_="Star.Project.GUI" Component_="Star.Project.GUI.dll"/>
-    <ROW Feature_="Star.Project.GUI" Component_="Star.Project.GUI.runtimeconfig.json"/>
-    <ROW Feature_="Star.Project.GUI" Component_="Star.Project.GUI.exe_1"/>
     <ROW Feature_="Star.Project.GUI" Component_="ModernWpf.Controls.dll"/>
     <ROW Feature_="Star.Project.GUI" Component_="ModernWpf.dll"/>
-    <ROW Feature_="Star.Project.GUI.pdb" Component_="Star.Project.GUI.exe"/>
     <ROW Feature_="Star.Project" Component_="Star.Project.runtimeconfig.json"/>
-    <ROW Feature_="Star.Project" Component_="System.CommandLine.dll"/>
-    <ROW Feature_="Star.Project" Component_="Shimakaze.Struct.Ini.dll"/>
-    <ROW Feature_="Star.Project" Component_="Star.Project.dll"/>
-    <ROW Feature_="Star.Project" Component_="Star.Project.exe"/>
-    <ROW Feature_="Star.Project" Component_="AI_ExePath"/>
-    <ROW Feature_="Star.Project.CLI.pdb" Component_="Star.Project.pdb"/>
+    <ROW Feature_="Star.Project.GUI" Component_="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.dll_1"/>
+    <ROW Feature_="Star.Project.GUI.Link" Component_="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.exe_1_1"/>
+    <ROW Feature_="Star.Project.GUI" Component_="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.runtimeconfig.json_1"/>
+    <ROW Feature_="Star.Project.CLI.pdb" Component_="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.pdb_1"/>
+    <ROW Feature_="Star.Project.GUI.pdb" Component_="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.pdb_1"/>
+    <ROW Feature_="Star.Project.Link" Component_="AI_ExePath"/>
+    <ROW Feature_="Star.Project" Component_="AI_CustomARPName"/>
+    <ROW Feature_="Star.Project" Component_="AI_DisableModify"/>
+    <ROW Feature_="Star.Project.Link" Component_="ProductInformation"/>
+    <ROW Feature_="Star.Project" Component_="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.dll_1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="Shimakaze.exe" SourcePath="..\Shimakaze.ico" Index="0"/>
-    <ROW Name="SystemFoldermsiexec.exe" SourcePath="&lt;AI_RES&gt;uninstall.ico" Index="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>
@@ -345,7 +392,6 @@
     <ROW Action="AI_EnableDebugLog" Sequence="51"/>
     <ROW Action="AI_SETMIXINSTLOCATION" Sequence="748"/>
     <ROW Action="AI_DetectSoftware" Sequence="102"/>
-    <ROW Action="AI_GetArpIconPath" Sequence="1401"/>
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="99" Builds="DefaultBuild"/>
     <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="101" Builds="DefaultBuild"/>
     <ROW Action="AI_DeleteCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="199" Builds="DefaultBuild"/>
@@ -357,6 +403,9 @@
     <ROW Action="AI_DeleteLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="6599" Builds="DefaultBuild"/>
     <ROW Action="AI_ExtractFiles" Sequence="1399" Builds="DefaultBuild"/>
     <ROW Action="AI_DATA_SETTER" Sequence="1398"/>
+    <ROW Action="AI_GetArpIconPath" Sequence="1401"/>
+    <ROW Action="AI_AiRemoveFilesImmediate" Sequence="3499"/>
+    <ROW Action="AI_AiRemoveFilesRollback" Sequence="3099"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstallUISequenceComponent">
     <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
@@ -400,6 +449,7 @@
     <ROW Registry="HelpTelephone" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="HelpTelephone" Value="[ARPHELPTELEPHONE]" Component_="AI_CustomARPName"/>
     <ROW Registry="InstallLocation" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="InstallLocation" Value="[APPDIR]" Component_="AI_CustomARPName"/>
     <ROW Registry="ModifyPath" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="ModifyPath" Value="[AI_UNINSTALLER] /i [ProductCode] AI_UNINSTALLER_CTP=1" Component_="AI_CustomARPName"/>
+    <ROW Registry="NoModify" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="NoModify" Value="#1" Component_="AI_DisableModify" VirtualValue="#"/>
     <ROW Registry="NoRepair" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="NoRepair" Value="#1" Component_="AI_CustomARPName" VirtualValue="#"/>
     <ROW Registry="Path" Root="-1" Key="Software\[Manufacturer_Code]\[ProductName]" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
     <ROW Registry="Publisher" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="Publisher" Value="[Manufacturer]" Component_="AI_CustomARPName"/>
@@ -412,8 +462,12 @@
     <ROW Registry="VersionMajor" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="VersionMajor" Value="#1" Component_="AI_CustomARPName" VirtualValue="#"/>
     <ROW Registry="VersionMinor" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="VersionMinor" Value="#0" Component_="AI_CustomARPName" VirtualValue="#"/>
   </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiRemoveFileComponent">
+    <ROW FileKey="_" Component_="ProductInformation" FileName="*" DirProperty="StarProject_Dir" InstallMode="2"/>
+  </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
-    <ROW Shortcut="ProductNameProductVersion" Directory_="StarProject_Dir" Name="卸载STAR~1.0|卸载 [|ProductName] [|ProductVersion]" Component_="ProductInformation" Target="[SystemFolder]msiexec.exe" Arguments="/x [ProductCode]" Hotkey="0" Icon_="SystemFoldermsiexec.exe" IconIndex="0" ShowCmd="1"/>
+    <ROW Shortcut="AI_PROPPATH_FILENAME_PERBUILD_Star." Directory_="StarProject_Dir" Name="STARPR~1.EXE|[|AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.exe_1]" Component_="AI_PROPPATH_FILENAME_PERBUILD_Star.Project.GUI.exe_1_1" Target="[#Star.Project.GUI.exe_1]" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
+    <ROW Shortcut="Star.Project" Directory_="StarProject_Dir" Name="STAR~1.PRO|Star.Project" Component_="AI_ExePath" Target="cmd \k [APPDIR]Star.Project.exe" Arguments="Your Arguments" Hotkey="0" Icon_="Shimakaze.exe" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
     <ATTRIBUTE name="UsedTheme" value="surface"/>
@@ -421,5 +475,17 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiUpgradeComponent">
     <ROW UpgradeCode="[|UpgradeCode]" VersionMin="0.0.1" VersionMax="[|ProductVersion]" Attributes="257" ActionProperty="OLDPRODUCTS"/>
     <ROW UpgradeCode="[|UpgradeCode]" VersionMin="[|ProductVersion]" Attributes="2" ActionProperty="AI_NEWERPRODUCTFOUND"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.VsProjectComponent">
+    <ROW ProjectId="{860b5980-6e10-4135-90ec-c2964385b414}" ProjectName="Star.Project.GUI" OutputGroup="PrimaryOutput" OutputFile="Star.Project.GUI.dll_1"/>
+    <ROW ProjectId="{860b5980-6e10-4135-90ec-c2964385b414}" ProjectName="Star.Project.GUI" OutputGroup="PrimaryOutput" OutputFile="Star.Project.GUI.runtimeconfig.json_1"/>
+    <ROW ProjectId="{860b5980-6e10-4135-90ec-c2964385b414}" ProjectName="Star.Project.GUI" OutputGroup="ContentOutput" OutputFile="Star.Project.exe_1"/>
+    <ROW ProjectId="{860b5980-6e10-4135-90ec-c2964385b414}" ProjectName="Star.Project.GUI" OutputGroup="ContentOutput" OutputFile="Star.Project.GUI.exe_1"/>
+    <ROW ProjectId="{860b5980-6e10-4135-90ec-c2964385b414}" ProjectName="Star.Project.GUI" OutputGroup="SymbolsOutput" OutputFile="Star.Project.GUI.pdb_1"/>
+    <ROW ProjectId="{c82337ed-1efd-47bc-a316-889ca2408263}" ProjectName="Star.Project" OutputGroup="PrimaryOutput" OutputFile="Star.Project.dll_1"/>
+    <ROW ProjectId="{c82337ed-1efd-47bc-a316-889ca2408263}" ProjectName="Star.Project" OutputGroup="PrimaryOutput" OutputFile="Star.Project.runtimeconfig.json_1"/>
+    <ROW ProjectId="{c82337ed-1efd-47bc-a316-889ca2408263}" ProjectName="Star.Project" OutputGroup="References" OutputFile="Shimakaze.Struct.Ini.dll_1"/>
+    <ROW ProjectId="{c82337ed-1efd-47bc-a316-889ca2408263}" ProjectName="Star.Project" OutputGroup="References" OutputFile="System.CommandLine.dll_1"/>
+    <ROW ProjectId="{c82337ed-1efd-47bc-a316-889ca2408263}" ProjectName="Star.Project" OutputGroup="SymbolsOutput" OutputFile="Star.Project.pdb_1"/>
   </COMPONENT>
 </DOCUMENT>
