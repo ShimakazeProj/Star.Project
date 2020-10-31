@@ -338,3 +338,8 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+# Advanced Installer
+**/*-cache
+**/*-SetupFiles
+*back.aip
