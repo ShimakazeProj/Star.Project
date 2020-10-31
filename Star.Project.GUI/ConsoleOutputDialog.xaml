@@ -7,12 +7,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Title="输出"
-    CloseButtonText="关闭"
     CloseButtonClick="ContentDialog_CloseButtonClick"
     d:DesignHeight="450" d:DesignWidth="800"
     mc:Ignorable="d">
-
     <Frame x:Name="consoleOutput" Width="500" Height="300"/>
-
 </ui:ContentDialog>
 

@@ -17,7 +17,7 @@ namespace Star.Project
             {
                 var cmd = new RootCommand("=StarProject= 工具集");
                 cmd.Name = "StarTools";
-                cmd.Add(KeyScreen.GetCommand());
+                cmd.Add(KeyScreen.Command);
                 cmd.Add(SectionScreen.GetCommand());
                 cmd.Add(Sorter.GetCommand());
                 return cmd;

@@ -77,34 +77,30 @@ namespace Star.Project.GUI
             (sender.IsEnabled, sender.Content) = (false, "正在处理");
             try
             {
-                if (string.IsNullOrWhiteSpace(this.ASB_Input.Text)) return;
+                if (string.IsNullOrWhiteSpace(this.ASB_Input.Text)
+                    || string.IsNullOrWhiteSpace(this.ASB_Output.Text)
+                    || string.IsNullOrWhiteSpace(this.ASB_Keep_Keys.Text)) return;
+
                 var list = new List<string>
                 {
                     KeyScreen.NAME,
                     KeyScreen.FILE_INPUT,
-                    $"\"{this.ASB_Input.Text}\""
+                    $"\"{this.ASB_Input.Text}\"",
+                    KeyScreen.FILE_OUTPUT,
+                    $"\"{this.ASB_Output.Text}\"",
+                    KeyScreen.KEEP_KEYS,
+                    this.ASB_Keep_Keys.Text.Replace(';','\x20')
                 };
 
-                if (!string.IsNullOrWhiteSpace(this.ASB_Output.Text))
+                if (!string.IsNullOrWhiteSpace(this.ASB_Ignore_Sections.Text))
                 {
-                    list.Add(KeyScreen.FILE_OUTPUT);
-                    list.Add($"\"{this.ASB_Output.Text}\"");
+                    list.Add(KeyScreen.IGNORE_SECTIONS);
+                    list.Add(this.ASB_Ignore_Sections.Text.Replace(';', '\x20'));
                 }
+                if (this.CB_MatchCase.IsChecked ?? false) list.Add(KeyScreen.MATCH_CASE);
+                if (this.CB_SortKey.IsChecked ?? false) list.Add(KeyScreen.SORT_KEY);
 
-                if (!string.IsNullOrWhiteSpace(this.ASB_Keep_Keys.Text))
-                {
-                    list.Add(KeyScreen.KEEP_KEYS);
-                    list.AddRange(this.ASB_Keep_Keys.Text.Split(';'));
-                }
-
-                if (this.CB_MatchCase.IsChecked ?? false)
-                {
-                    list.Add(KeyScreen.MATCH_CASE);
-                }
-
-                var sb = new StringBuilder().AppendJoin(' ', list).ToString();
-
-                _ = new ConsoleOutputDialog(sb).ShowAsync();
+                await new ConsoleOutputDialog(new StringBuilder().AppendJoin(' ', list).ToString()).ShowAsync();
             }
             finally
             {

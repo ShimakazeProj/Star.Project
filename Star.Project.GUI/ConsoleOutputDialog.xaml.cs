@@ -29,7 +29,7 @@ namespace Star.Project.GUI
     /// </summary>
     public partial class ConsoleOutputDialog
     {
-        private string command;
+        private readonly string command;
 
         public ConsoleOutputDialog()
         {
@@ -41,7 +41,7 @@ namespace Star.Project.GUI
 
         private void ContentDialog_CloseButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args) => ConsoleHelper.FreeConsole();
 
-        private void consoleOutput_Loaded(object sender, RoutedEventArgs e)
+        private async void consoleOutput_Loaded(object sender, RoutedEventArgs e)
         {
             this.consoleOutput.Loaded -= consoleOutput_Loaded;
 
@@ -55,7 +55,8 @@ namespace Star.Project.GUI
             this.SizeChanged += (o, e) => ctrl.UpdateSize(this.TransformToAncestor(App.Current.MainWindow).Transform(this.consoleOutput.TransformToAncestor(this).Transform(new Point(0, 0))));
 
 
-            _ = Program.RootCommand.InvokeAsync(this.command, new SystemConsole());
+            await Program.RootCommand.InvokeAsync(this.command, new SystemConsole());
+            this.CloseButtonText = "完成";
         }
     }
 }

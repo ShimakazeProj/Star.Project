@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <NeutralLanguage>zh-CN</NeutralLanguage>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\舰队的偶像-岛风酱!.pfx</AssemblyOriginatorKeyFile>
+    <Authors>舰队的偶像-岛风酱!</Authors>
+    <Description>简单的工具集</Description>
+    <Copyright>Copyright © 2020 舰队的偶像-岛风酱!</Copyright>
+    <ApplicationIcon>..\Shimakaze.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Shimakaze.Struct.Ini" Version="1.0.5-preview" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20371.2" />
+  </ItemGroup>
+
+</Project>

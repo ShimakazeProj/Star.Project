@@ -36,7 +36,9 @@
         <ui:ScrollViewerEx x:Name="sv" Grid.Row="1">
             <ui:SimpleStackPanel Margin="30 0" Spacing="8">
                 <ui:AutoSuggestBox x:Name="ASB_Keep_Keys" Header="保留键名(使用分号或空格分隔)" ToolTip="输入若干个需要保留的键名, 将删除所有未在列表中的键, 若经过处理后节内容为空, 则删除该节 (Default: {null})" />
+                <ui:AutoSuggestBox x:Name="ASB_Ignore_Sections" Header="忽略节名(使用分号或空格分隔)" ToolTip="输入若干个不需要保留的节名, 将删除所有在列表中的节 (Default: {null})" />
                 <CheckBox x:Name="CB_MatchCase" Content="区分大小写" ToolTip="区分大小写 (Default: false)" />
+                <CheckBox x:Name="CB_SortKey" Content="排序键" ToolTip="按照 &quot;保留键名&quot; 的顺序排序 (Default: false)" />
             </ui:SimpleStackPanel>
         </ui:ScrollViewerEx>
     </Grid>
