@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>..\舰队的偶像-岛风酱!.pfx</AssemblyOriginatorKeyFile>
     <Authors>舰队的偶像-岛风酱!</Authors>
     <Description>简单的工具集</Description>
