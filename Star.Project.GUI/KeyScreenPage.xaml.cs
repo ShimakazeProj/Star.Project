@@ -50,6 +50,13 @@ namespace Star.Project.GUI
                         bool.TryParse(item.Value, out var b);
                         this.CB_MatchCase.IsChecked = b;
                         break;
+                    case nameof(KeyScreen.IGNORE_SECTIONS):
+                        this.ASB_Ignore_Sections.Text = item.Value;
+                        break;
+                    case nameof(KeyScreen.SORT_KEY):
+                        bool.TryParse(item.Value, out b);
+                        this.CB_SortKey.IsChecked = b;
+                        break;
                     default:
                         break;
                 }
@@ -63,6 +70,12 @@ namespace Star.Project.GUI
 
             if (this.CB_MatchCase.IsChecked ?? false)
                 temp.Add((nameof(KeyScreen.MATCH_CASE), true.ToString()));
+
+            if (!string.IsNullOrWhiteSpace(this.ASB_Ignore_Sections.Text))
+                temp.Add((nameof(KeyScreen.IGNORE_SECTIONS), this.ASB_Ignore_Sections.Text));
+
+            if (this.CB_SortKey.IsChecked ?? false)
+                temp.Add((nameof(KeyScreen.SORT_KEY), true.ToString()));
 
             await using var fs = file.OpenWrite();
             await using var sw = new StreamWriter(fs);
