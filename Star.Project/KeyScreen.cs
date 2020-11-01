@@ -92,8 +92,14 @@ namespace Star.Project
             Func<string[], string, bool> containsFunc
             )
         {
+            Func<IEnumerable<IniSection>> getSections;
+            if (options.IgnoreSections is null)
+                getSections = () => @this.ini.Sections;
+            else
+                getSections = () => @this.ini.Sections.Where(i => !options.IgnoreSections.Contains(i.Name));
+
             // 2. 筛选并保留目标键
-            foreach (var section in @this.ini.Sections.Where(i => !options.IgnoreSections.Contains(i.Name)))// 遍历节内容
+            foreach (var section in getSections())// 遍历节内容
             {
                 console.Out.WriteLine($"[{DateTime.Now:O}]Trace\t正在遍历节[{section.Name}]");
                 foreach (var keyValuePair in section.Content)// 遍历键内容
