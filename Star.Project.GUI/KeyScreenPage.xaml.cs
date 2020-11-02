@@ -43,17 +43,17 @@ namespace Star.Project.GUI
 
                 switch (item.Key.Trim().ToUpper())
                 {
-                    case nameof(KeyScreen.KEEP_KEYS):
+                    case nameof(KeyScreenTool.KEEP_KEYS):
                         this.ASB_Keep_Keys.Text = item.Value;
                         break;
-                    case nameof(KeyScreen.MATCH_CASE):
+                    case nameof(KeyScreenTool.MATCH_CASE):
                         bool.TryParse(item.Value, out var b);
                         this.CB_MatchCase.IsChecked = b;
                         break;
-                    case nameof(KeyScreen.IGNORE_SECTIONS):
+                    case nameof(KeyScreenTool.IGNORE_SECTIONS):
                         this.ASB_Ignore_Sections.Text = item.Value;
                         break;
-                    case nameof(KeyScreen.SORT_KEY):
+                    case nameof(KeyScreenTool.SORT_KEY):
                         bool.TryParse(item.Value, out b);
                         this.CB_SortKey.IsChecked = b;
                         break;
@@ -66,16 +66,16 @@ namespace Star.Project.GUI
         {
             var temp = new List<(string Key, string Value)>();
             if (!string.IsNullOrWhiteSpace(this.ASB_Keep_Keys.Text))
-                temp.Add((nameof(KeyScreen.KEEP_KEYS), this.ASB_Keep_Keys.Text));
+                temp.Add((nameof(KeyScreenTool.KEEP_KEYS), this.ASB_Keep_Keys.Text));
 
             if (this.CB_MatchCase.IsChecked ?? false)
-                temp.Add((nameof(KeyScreen.MATCH_CASE), true.ToString()));
+                temp.Add((nameof(KeyScreenTool.MATCH_CASE), true.ToString()));
 
             if (!string.IsNullOrWhiteSpace(this.ASB_Ignore_Sections.Text))
-                temp.Add((nameof(KeyScreen.IGNORE_SECTIONS), this.ASB_Ignore_Sections.Text));
+                temp.Add((nameof(KeyScreenTool.IGNORE_SECTIONS), this.ASB_Ignore_Sections.Text));
 
             if (this.CB_SortKey.IsChecked ?? false)
-                temp.Add((nameof(KeyScreen.SORT_KEY), true.ToString()));
+                temp.Add((nameof(KeyScreenTool.SORT_KEY), true.ToString()));
 
             await using var fs = file.OpenWrite();
             await using var sw = new StreamWriter(fs);
@@ -96,22 +96,22 @@ namespace Star.Project.GUI
 
                 var list = new List<string>
                 {
-                    KeyScreen.NAME,
-                    KeyScreen.FILE_INPUT,
+                    KeyScreenTool.NAME,
+                    KeyScreenTool.FILE_INPUT,
                     $"\"{this.ASB_Input.Text}\"",
-                    KeyScreen.FILE_OUTPUT,
+                    KeyScreenTool.FILE_OUTPUT,
                     $"\"{this.ASB_Output.Text}\"",
-                    KeyScreen.KEEP_KEYS,
+                    KeyScreenTool.KEEP_KEYS,
                     this.ASB_Keep_Keys.Text.Replace(';','\x20')
                 };
 
                 if (!string.IsNullOrWhiteSpace(this.ASB_Ignore_Sections.Text))
                 {
-                    list.Add(KeyScreen.IGNORE_SECTIONS);
+                    list.Add(KeyScreenTool.IGNORE_SECTIONS);
                     list.Add(this.ASB_Ignore_Sections.Text.Replace(';', '\x20'));
                 }
-                if (this.CB_MatchCase.IsChecked ?? false) list.Add(KeyScreen.MATCH_CASE);
-                if (this.CB_SortKey.IsChecked ?? false) list.Add(KeyScreen.SORT_KEY);
+                if (this.CB_MatchCase.IsChecked ?? false) list.Add(KeyScreenTool.MATCH_CASE);
+                if (this.CB_SortKey.IsChecked ?? false) list.Add(KeyScreenTool.SORT_KEY);
 
                 await new ConsoleOutputDialog(new StringBuilder().AppendJoin(' ', list).ToString()).ShowAsync();
             }

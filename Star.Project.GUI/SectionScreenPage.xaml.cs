@@ -18,6 +18,7 @@ using Microsoft.Win32;
 using ModernWpf.Controls;
 
 using Star.Project.GUI.Data;
+using Star.Project.Tools;
 
 namespace Star.Project.GUI
 {
@@ -43,10 +44,10 @@ namespace Star.Project.GUI
 
                 switch (item.Key.Trim().ToUpper())
                 {
-                    case nameof(SectionScreen.KEEP_SECTIONS):
+                    case nameof(SectionScreenTool.KEEP_SECTIONS):
                         this.ASB_Keep_Sections.Text = item.Value;
                         break;
-                    case nameof(SectionScreen.MATCH_CASE):
+                    case nameof(SectionScreenTool.MATCH_CASE):
                         bool.TryParse(item.Value, out var b);
                         this.CB_MatchCase.IsChecked = b;
                         break;
@@ -60,10 +61,10 @@ namespace Star.Project.GUI
             var temp = new List<(string Key, string Value)>();
 
             if (!string.IsNullOrWhiteSpace(this.ASB_Keep_Sections.Text))
-                temp.Add((nameof(SectionScreen.KEEP_SECTIONS), this.ASB_Keep_Sections.Text));
+                temp.Add((nameof(SectionScreenTool.KEEP_SECTIONS), this.ASB_Keep_Sections.Text));
 
             if (this.CB_MatchCase.IsChecked ?? false)
-                temp.Add((nameof(SectionScreen.MATCH_CASE), true.ToString()));
+                temp.Add((nameof(SectionScreenTool.MATCH_CASE), true.ToString()));
 
             await using var fs = file.OpenWrite();
             await using var sw = new StreamWriter(fs);
@@ -81,31 +82,29 @@ namespace Star.Project.GUI
                 if (string.IsNullOrWhiteSpace(this.ASB_Input.Text)) return;
                 var list = new List<string>
                 {
-                    SectionScreen.NAME,
-                    SectionScreen.FILE_INPUT,
+                    SectionScreenTool.NAME,
+                    SectionScreenTool.FILE_INPUT,
                     $"\"{this.ASB_Input.Text}\""
                 };
 
                 if (!string.IsNullOrWhiteSpace(this.ASB_Output.Text))
                 {
-                    list.Add(SectionScreen.FILE_OUTPUT);
+                    list.Add(SectionScreenTool.FILE_OUTPUT);
                     list.Add($"\"{this.ASB_Output.Text}\"");
                 }
 
                 if (!string.IsNullOrWhiteSpace(this.ASB_Keep_Sections.Text))
                 {
-                    list.Add(SectionScreen.KEEP_SECTIONS);
+                    list.Add(SectionScreenTool.KEEP_SECTIONS);
                     list.AddRange(this.ASB_Keep_Sections.Text.Split(';'));
                 }
 
                 if (this.CB_MatchCase.IsChecked ?? false)
                 {
-                    list.Add(SectionScreen.MATCH_CASE);
+                    list.Add(SectionScreenTool.MATCH_CASE);
                 }
 
-                var sb = new StringBuilder().AppendJoin(' ', list).ToString();
-
-                _ = new ConsoleOutputDialog(sb).ShowAsync();
+                await new ConsoleOutputDialog(new StringBuilder().AppendJoin(' ', list).ToString()).ShowAsync();
             }
             finally
             {

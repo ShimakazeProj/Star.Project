@@ -27,14 +27,17 @@
             </ui:NavigationView.PaneHeader>
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
-                    Content="键筛选器" Icon="Bullets"
+                    Content="键筛选器" Icon="ShowResults"
                     Tag="{x:Type local:KeyScreenPage}" />
                 <ui:NavigationViewItem
-                    Content="节筛选器" Icon="Bullets"
+                    Content="节筛选器" Icon="ShowResults"
                     Tag="{x:Type local:SectionScreenPage}" />
                 <ui:NavigationViewItem
-                    Content="注册表排序器" Icon="Sort"
+                    Content="注册表生成器" Icon="Sort"
                     Tag="{x:Type local:SorterPage}" />
+                <ui:NavigationViewItem
+                    Content="INI合并工具" Icon="ImportAll"
+                    Tag="{x:Type local:IniMergePage}" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.Header>
                 <TextBlock DataContext="{Binding Content,ElementName=ContentFrame}" Text="{Binding Title}"/>

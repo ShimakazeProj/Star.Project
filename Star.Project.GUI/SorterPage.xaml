@@ -15,27 +15,31 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <StackPanel>
-            <StackPanel.Background>
-                <SolidColorBrush Color="{ui:ThemeResource SystemChromeLowColor}" />
-            </StackPanel.Background>
-            <TextBlock
-                Margin="15,5"
-                FontSize="26" Text="文件" />
-            <ui:SimpleStackPanel Margin="20,0" Spacing="8">
-                <ui:AutoSuggestBox x:Name="ASB_Input"
-                    Header="输入文件 (Required)"
-                    QuerySubmitted="Input_QuerySubmitted">
-                    <ui:AutoSuggestBox.QueryIcon>
-                        <ui:SymbolIcon Symbol="OpenFile" />
-                    </ui:AutoSuggestBox.QueryIcon>
-                </ui:AutoSuggestBox>
-                <ui:AutoSuggestBox x:Name="ASB_Output"
-                    Header="输出文件" QuerySubmitted="Output_QuerySubmitted">
-                    <ui:AutoSuggestBox.QueryIcon>
-                        <ui:SymbolIcon Symbol="OpenFile" />
-                    </ui:AutoSuggestBox.QueryIcon>
-                </ui:AutoSuggestBox>
-            </ui:SimpleStackPanel>
+            <ui:ThemeShadowChrome Depth="30">
+                <StackPanel>
+                    <StackPanel.Background>
+                        <SolidColorBrush  Color="{ui:ThemeResource SystemChromeLowColor}"/>
+                    </StackPanel.Background>
+                    <TextBlock
+                    Margin="15,5"
+                    FontSize="26" Text="文件" />
+                    <ui:SimpleStackPanel Margin="20,5" Spacing="8">
+                        <ui:AutoSuggestBox x:Name="ASB_Input"
+                        Header="输入文件 (Required)"
+                        QuerySubmitted="Input_QuerySubmitted">
+                            <ui:AutoSuggestBox.QueryIcon>
+                                <ui:SymbolIcon Symbol="OpenFile" />
+                            </ui:AutoSuggestBox.QueryIcon>
+                        </ui:AutoSuggestBox>
+                        <ui:AutoSuggestBox x:Name="ASB_Output"
+                        Header="输出文件" QuerySubmitted="Output_QuerySubmitted">
+                            <ui:AutoSuggestBox.QueryIcon>
+                                <ui:SymbolIcon Symbol="OpenFile" />
+                            </ui:AutoSuggestBox.QueryIcon>
+                        </ui:AutoSuggestBox>
+                    </ui:SimpleStackPanel>
+                </StackPanel>
+            </ui:ThemeShadowChrome>
             <TextBlock
                 Margin="15,5"
                 FontSize="26" Text="选项" />
