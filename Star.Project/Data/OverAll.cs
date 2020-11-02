@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Star.Project
+namespace Star.Project.Data
 {
-    public static class DefaultHelper
+    public static class OverAll
     {
 
         public static bool True() => true;

@@ -3,11 +3,13 @@ using System.CommandLine.IO;
 using System.CommandLine.Parsing;
 using System.Threading.Tasks;
 
+using Star.Project.Tools;
+
 namespace Star.Project
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        static async Task Main(string[] args)
         {
             await RootCommand.InvokeAsync(args, new Data.SystemConsole());
         }
@@ -15,11 +17,13 @@ namespace Star.Project
         {
             get
             {
-                var cmd = new RootCommand("=StarProject= 工具集");
+                var cmd = new RootCommand("=StarProject= 工具集")
+                {
+                    KeyScreenTool.Command,
+                    SectionScreenTool.Command,
+                    IniSorterTool.Command
+                };
                 cmd.Name = "StarTools";
-                cmd.Add(KeyScreen.Command);
-                cmd.Add(SectionScreen.GetCommand());
-                cmd.Add(Sorter.GetCommand());
                 return cmd;
             }
         }

@@ -9,42 +9,48 @@ using System.Threading.Tasks;
 
 using Shimakaze.Struct.Ini;
 
-namespace Star.Project
+using Star.Project.Data;
+using Star.Project.Data.Options;
+
+namespace Star.Project.Tools
 {
-    public static class SectionScreen
+    public static class SectionScreenTool
     {
         public const string FILE_INPUT = "--file-input";
         public const string FILE_OUTPUT = "--file-output";
         public const string KEEP_SECTIONS = "--keep-sections";
         public const string MATCH_CASE = "--match-case";
         public const string NAME = "section-screen";
-        public static Command GetCommand()
+        public static Command Command
         {
-            var file_input = new Option<FileInfo>(FILE_INPUT, "打开一个将要被处理的文件") { IsRequired = true };
-            file_input.Argument.Name = "文件";
+            get
+            {
+                var file_input = new Option<FileInfo>(FILE_INPUT, "打开一个将要被处理的文件") { IsRequired = true };
+                file_input.Argument.Name = "文件";
 
-            var file_output = new Option<FileInfo>(FILE_OUTPUT, "将经过处理后的数据写入目标文件");
-            file_output.Argument.Name = "文件";
+                var file_output = new Option<FileInfo>(FILE_OUTPUT, "将经过处理后的数据写入目标文件");
+                file_output.Argument.Name = "文件";
 
-            var keep_section = new Option<string[]>(KEEP_SECTIONS, "输入若干个需要保留的键, 将删除所有未在列表中的节") { IsRequired = true };
-            keep_section.Argument.Name = "节名";
+                var keep_section = new Option<string[]>(KEEP_SECTIONS, "输入若干个需要保留的键, 将删除所有未在列表中的节") { IsRequired = true };
+                keep_section.Argument.Name = "节名";
 
-            var ignore_case = new Option<bool>(MATCH_CASE, DefaultHelper.False, "是否区分大小写");
+                var ignore_case = new Option<bool>(MATCH_CASE, OverAll.False, "是否区分大小写");
 
-            var cmd = new Command(NAME, "INI 格式化工具")
+                var cmd = new Command(NAME, "INI 格式化工具")
             {
                 file_input,
                 file_output,
                 keep_section,
                 ignore_case
             };
-            cmd.Handler = CommandHandler.Create<ParseResult, IConsole>(ParseAsync);
-            return cmd;
+                cmd.Handler = CommandHandler.Create<ParseResult, IConsole>(ParseAsync);
+                return cmd;
+            }
         }
 
         public static async Task ParseAsync(ParseResult parseResult, IConsole console)
         {
-            CleannerOptions options;
+            SectionScreenOptions options;
 
             var source = parseResult.ValueForOption<FileInfo>(FILE_INPUT);
             var target = parseResult.ValueForOption<FileInfo>(FILE_OUTPUT);
@@ -69,13 +75,13 @@ namespace Star.Project
             await ScreeningAsync(options, console);
         }
 
-        public static async Task ScreeningAsync(CleannerOptions options, IConsole console)
+        public static async Task ScreeningAsync(SectionScreenOptions options, IConsole console)
         {
             IniDocument ini, result;
             try
             {
                 // 0. 判断程序是否具备执行条件
-                if ((options.Sections is null || options.Sections.Length < 1))// 未设置目标键或目标键为空
+                if (options.Sections is null || options.Sections.Length < 1)// 未设置目标键或目标键为空
                 {
                     console.Error.WriteLine($"{nameof(options.Sections)} are NULL or Empty");
                     return;
@@ -97,12 +103,5 @@ namespace Star.Project
             }
         }
 
-        public struct CleannerOptions
-        {
-            public TextReader Input;
-            public bool MatchCase;
-            public TextWriter Output;
-            public string[] Sections;
-        }
     }
 }

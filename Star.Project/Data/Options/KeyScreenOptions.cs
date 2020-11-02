@@ -3,7 +3,7 @@ using System.CommandLine;
 using System.CommandLine.IO;
 using System.IO;
 
-namespace Star.Project
+namespace Star.Project.Data.Options
 {
     internal struct KeyScreenOptions
     {

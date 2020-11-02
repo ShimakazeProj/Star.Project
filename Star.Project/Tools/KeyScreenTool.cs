@@ -10,12 +10,16 @@ using System.Threading.Tasks;
 
 using Shimakaze.Struct.Ini;
 
+using Star.Project.Data;
+using Star.Project.Data.Options;
+
 namespace Star.Project
 {
-    public static class KeyScreen
+    public static class KeyScreenTool
     {
         public const string FILE_INPUT = "--file-input";
         public const string FILE_OUTPUT = "--file-output";
+
         public const string KEEP_KEYS = "--target";
         public const string MATCH_CASE = "--match-case";
         public const string SORT_KEY = "--sort-key";
@@ -27,8 +31,8 @@ namespace Star.Project
             new Option<FileInfo>(FILE_OUTPUT, "将经过处理后的数据写入目标文件").SetArgumentName("文件"),
             new Option<string[]>(KEEP_KEYS, "输入若干个需要保留的键名, 将删除所有未在列表中的键, 若经过处理后节内容为空, 则删除该节") { IsRequired = true }.SetArgumentName("键名"),
             new Option<string[]>(IGNORE_SECTIONS, "输入若干个不需要保留的节名, 将删除所有在列表中的节").SetArgumentName("节名"),
-            new Option<bool>(MATCH_CASE, DefaultHelper.False, "是否区分大小写"),
-            new Option<bool>(SORT_KEY, DefaultHelper.False, "根据键列表排序")
+            new Option<bool>(MATCH_CASE, OverAll.False, "是否区分大小写"),
+            new Option<bool>(SORT_KEY, OverAll.False, "根据键列表排序")
         }.SetHandler(CommandHandler.Create<ParseResult, IConsole>(ParseAsync));
 
         private static async Task ParseAsync(ParseResult parseResult, IConsole console)

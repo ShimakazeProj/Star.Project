@@ -12,9 +12,11 @@ using System.Threading.Tasks;
 
 using Shimakaze.Struct.Ini;
 
-namespace Star.Project
+using Star.Project.Data;
+
+namespace Star.Project.Tools
 {
-    public class Sorter
+    public class IniSorterTool
     {
         public const string CONSTRAINT_KEY = "--constraint-key";
         public const string CONSTRAINT_VALUE = "--constraint-value";
@@ -30,35 +32,37 @@ namespace Star.Project
         public const string TARGET_SECTION = "--section-head";
         public const string NAME = "sort";
 
-        public static Command GetCommand()
+        public static Command Command
         {
-            var file_input = new Option<FileInfo>(FILE_INPUT, "将文件作为输入源") { IsRequired = true };
-            file_input.Argument.Name = "文件";
-            var file_output = new Option<FileInfo>(FILE_OUTPUT, "设置输出文件");
-            file_output.Argument.Name = "文件";
+            get
+            {
+                var file_input = new Option<FileInfo>(FILE_INPUT, "将文件作为输入源") { IsRequired = true };
+                file_input.Argument.Name = "文件";
+                var file_output = new Option<FileInfo>(FILE_OUTPUT, "设置输出文件");
+                file_output.Argument.Name = "文件";
 
-            var start = new Option<int>(START_NUM, () => 0, "以此数字开始计数");
-            start.Argument.Name = "整数";
-            var digit = new Option<int>(DIGIT, () => 0, "以此数字规范长度");
-            digit.Argument.Name = "整数";
-            var prefix = new Option<string>(PREFIX, "在输出的键前添加一个前缀, %s将会被替换为指定键的值");
-            prefix.Argument.Name = "前缀";
-            var prefixKey = new Option<string>(PREFIX_KEY, "将该键的值作为前缀输出");
-            prefixKey.Argument.Name = "前缀键";
+                var start = new Option<int>(START_NUM, () => 0, "以此数字开始计数");
+                start.Argument.Name = "整数";
+                var digit = new Option<int>(DIGIT, () => 0, "以此数字规范长度");
+                digit.Argument.Name = "整数";
+                var prefix = new Option<string>(PREFIX, "在输出的键前添加一个前缀, %s将会被替换为指定键的值");
+                prefix.Argument.Name = "前缀";
+                var prefixKey = new Option<string>(PREFIX_KEY, "将该键的值作为前缀输出");
+                prefixKey.Argument.Name = "前缀键";
 
-            var sort = new Option<bool>(SORT, DefaultHelper.False, "对输出进行排序");
-            var sortKey = new Option<string[]>(SORT_KEYS, "根据目标键的指排序");
-            sortKey.Argument.Name = "排序依赖键";
-            var target = new Option<string>(TARGET_SECTION, "在输出结果前添加一个节头");
-            target.Argument.Name = "节名";
-            var summary = new Option<string>(SUMMARY_KEY, "将此键的值作为注释输出");
-            summary.Argument.Name = "注释键";
-            var constraintKey = new Option<string>(CONSTRAINT_KEY, "只有包含此键的节才会被输出");
-            constraintKey.Argument.Name = "约束键";
-            var constraintValue = new Option<string>(CONSTRAINT_VALUE, "只有当键约束的键值等于这里的值时才会被输出");
-            constraintValue.Argument.Name = "约束值";
+                var sort = new Option<bool>(SORT, OverAll.False, "对输出进行排序");
+                var sortKey = new Option<string[]>(SORT_KEYS, "根据目标键的指排序");
+                sortKey.Argument.Name = "排序依赖键";
+                var target = new Option<string>(TARGET_SECTION, "在输出结果前添加一个节头");
+                target.Argument.Name = "节名";
+                var summary = new Option<string>(SUMMARY_KEY, "将此键的值作为注释输出");
+                summary.Argument.Name = "注释键";
+                var constraintKey = new Option<string>(CONSTRAINT_KEY, "只有包含此键的节才会被输出");
+                constraintKey.Argument.Name = "约束键";
+                var constraintValue = new Option<string>(CONSTRAINT_VALUE, "只有当键约束的键值等于这里的值时才会被输出");
+                constraintValue.Argument.Name = "约束值";
 
-            var cmd = new Command(NAME, "INI 排序工具")
+                var cmd = new Command(NAME, "INI 排序工具")
             {
                 file_input,
                 file_output,
@@ -75,13 +79,14 @@ namespace Star.Project
                 constraintKey,
                 constraintValue
             };
-            cmd.Handler = CommandHandler.Create<ParseResult, IConsole>(ParseAsync);
-            return cmd;
+                cmd.Handler = CommandHandler.Create<ParseResult, IConsole>(ParseAsync);
+                return cmd;
+            }
         }
 
         public static async Task ParseAsync(ParseResult parseResult, IConsole console)
         {
-            SortSectionOptions options;
+            IniSortSectionOptions options;
 
             var source = parseResult.ValueForOption<FileInfo>(FILE_INPUT);
             var target = parseResult.ValueForOption<FileInfo>(FILE_OUTPUT);
@@ -123,11 +128,11 @@ namespace Star.Project
             console.Out.WriteLine($"[{DateTime.Now:O}]Info\t完成");
         }
 
-        public static async Task WorkAsync(SortSectionOptions options, IConsole console)
+        public static async Task WorkAsync(IniSortSectionOptions options, IConsole console)
         {
             var ini = await IniDocument.ParseAsync(options.Input);
             IEnumerable<IniSection> Result = ini.Sections;// 约束筛选
-            List<IniKeyValuePair> result = new List<IniKeyValuePair>();// 结果
+            var result = new List<IniKeyValuePair>();// 结果
             int num = options.First;
 
             if (!string.IsNullOrEmpty(options.KeyConstraint))
@@ -173,7 +178,7 @@ namespace Star.Project
                     {
                         var key = $"{options.Prefix ?? string.Empty}{num++.ToString().PadLeft(options.Digit, '0')}";
                         var value = i.Name;
-                        result.Add(new IniKeyValuePair(key, value));
+                        result.Add(IniKeyValuePair.CreateDataLine(key, value));
                     }
                 }
                 else
@@ -183,7 +188,7 @@ namespace Star.Project
                         var key = $"{options.Prefix ?? string.Empty}{num++.ToString().PadLeft(options.Digit, '0')}";
                         var value = i.Name;
                         var summary = i.TryGetKey(options.SummaryKey)?.Value ?? string.Empty;
-                        result.Add(new IniKeyValuePair(key, value, summary));
+                        result.Add(IniKeyValuePair.CreateFullLine(key, value, summary));
                     }
                 }
             else
@@ -198,7 +203,7 @@ namespace Star.Project
                     var key = $"{prefix}{num++.ToString().PadLeft(options.Digit, '0')}";
                     var value = i.Name;
                     var summary = i.TryGetKey(options.SummaryKey)?.Value ?? string.Empty;
-                    result.Add(new IniKeyValuePair(key, value, summary));
+                    result.Add(IniKeyValuePair.CreateFullLine(key, value, summary));
                 }
 
             console.Out.WriteLine($"[{DateTime.Now:O}]Info\t输出结果");
@@ -215,7 +220,7 @@ namespace Star.Project
             await options.Output?.FlushAsync();
         }
 
-        public struct SortSectionOptions
+        public struct IniSortSectionOptions
         {
             public int Digit;
             public int First;
