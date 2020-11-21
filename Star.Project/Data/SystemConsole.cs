@@ -15,7 +15,7 @@ namespace Star.Project.Data
 
         public SystemConsole()
         {
-            Out = StandardStreamWriter.Create(new ConsoleWriter());
+            Out = StandardStreamWriter.Create(new ConsoleStdWriter());
             Error = StandardStreamWriter.Create(Console.Error);
         }
     }

@@ -3,6 +3,8 @@ using System.CommandLine;
 using System.CommandLine.IO;
 using System.IO;
 
+using Star.Project.Extensions;
+
 namespace Star.Project.Data.Options
 {
     internal struct KeyScreenOptions
@@ -16,10 +18,10 @@ namespace Star.Project.Data.Options
 
         public KeyScreenOptions DebugWrite(IConsole console)
         {
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t保留键: {(this.Keys is null ? null : '[' + string.Join(", ", this.Keys) + ']')}");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t忽略节: {(this.IgnoreSections is null ? null : '[' + string.Join(", ", this.IgnoreSections) + ']')}");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t区分大小写: {this.MatchCase}");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t排序键: {this.SortKey}");
+            console.Debug($"保留键: {(this.Keys is null ? null : '[' + string.Join(", ", this.Keys) + ']')}");
+            console.Debug($"忽略节: {(this.IgnoreSections is null ? null : '[' + string.Join(", ", this.IgnoreSections) + ']')}");
+            console.Debug($"区分大小写: {this.MatchCase}");
+            console.Debug($"排序键: {this.SortKey}");
             return this;
         }
     }

@@ -12,6 +12,7 @@ using Shimakaze.Struct.Ini;
 
 using Star.Project.Data;
 using Star.Project.Data.Options;
+using Star.Project.Extensions;
 
 namespace Star.Project
 {
@@ -42,8 +43,8 @@ namespace Star.Project
             await using var ifs = source.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
             await using var ofs = target?.OpenWrite();
 
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t源文件: {source}");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t目标文件: {target}");
+            console.Debug($"源文件: {source}");
+            console.Debug($"目标文件: {target}");
 
             await new KeyScreenOptions
             {
@@ -105,12 +106,12 @@ namespace Star.Project
             // 2. 筛选并保留目标键
             foreach (var section in getSections())// 遍历节内容
             {
-                console.Out.WriteLine($"[{DateTime.Now:O}]Trace\t正在遍历节[{section.Name}]");
+                console.Trace($"正在遍历节[{section.Name}]");
                 foreach (var keyValuePair in section.Content)// 遍历键内容
                 {
                     if (keyValuePair.HasData && containsFunc(options.Keys, keyValuePair.Key))// 存在有效数据
                     {
-                        console.Out.WriteLine($"[{DateTime.Now:O}]Trace\t找到键[{keyValuePair.Key}]");
+                        console.Trace($"找到键[{keyValuePair.Key}]");
 
                         if (@this.target.TryGetValue((section.Name, section.Summary), out var targetSection))// 尝试从字典中获取目标节
                             targetSection.Add(keyValuePair);

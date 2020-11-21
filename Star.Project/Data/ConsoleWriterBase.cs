@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Star.Project.Data
 {
-    public class ConsoleWriter : TextWriter
+    public abstract class ConsoleWriterBase : TextWriter
     {
         // 使用UTF-16避免不必要的编码转换
         public override Encoding Encoding => Encoding.Unicode;
@@ -30,28 +30,24 @@ namespace Star.Project.Data
                 }
                 Write("]");
                 sb.Remove(0, 1);
-                Write(sb.ToString(), sb.ToString(0, 4).ToUpper() switch
+                Write(sb.ToString(0, 5), sb.ToString(0, 5).ToUpper() switch
                 {
-                    "DEBU" => ConsoleColor.Green,
-                    "TRAC" => ConsoleColor.DarkGray,
-                    "INFO" => ConsoleColor.White,
-                    "WARN" => ConsoleColor.Yellow,
-                    "FAIL" => ConsoleColor.Red,
+                    "DEBUG" => ConsoleColor.Green,
+                    "TRACE" => ConsoleColor.DarkGray,
+                    "INFO " => ConsoleColor.White,
+                    "WARN " => ConsoleColor.Yellow,
+                    "FATAL" => ConsoleColor.Red,
                     _ => null,
                 });
-
+                sb.Remove(0, 5);
+                Write(sb.ToString());
             }
             else
             {
                 Write(sb.ToString());
             }
         }
-        public static void Write(string msg, ConsoleColor? color = null)
-        {
-            if (color.HasValue) Console.ForegroundColor = color.Value;
-            Console.Write(msg);
-            Console.ResetColor();
-        }
+        public abstract void Write(string msg, ConsoleColor? color = null);
     }
 }
 

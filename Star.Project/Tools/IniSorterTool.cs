@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Shimakaze.Struct.Ini;
 
 using Star.Project.Data;
+using Star.Project.Extensions;
 
 namespace Star.Project.Tools
 {
@@ -106,26 +107,26 @@ namespace Star.Project.Tools
             options.KeyConstraint = parseResult.ValueForOption<string>(CONSTRAINT_KEY);
             options.ValueConstraint = parseResult.ValueForOption<string>(CONSTRAINT_VALUE);
 
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t源文件: {source}");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t目标文件: {target}");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t起始数字: {options.First}");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t长度限制: {options.Digit}");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t输出前缀: {options.Prefix}");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t前缀键: {options.PrefixKey}");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t重新排序: {options.Sort}");
+            console.Debug($"源文件: {source}");
+            console.Debug($"目标文件: {target}");
+            console.Debug($"起始数字: {options.First}");
+            console.Debug($"长度限制: {options.Digit}");
+            console.Debug($"输出前缀: {options.Prefix}");
+            console.Debug($"前缀键: {options.PrefixKey}");
+            console.Debug($"重新排序: {options.Sort}");
             if (options.SortTargetKeys is null)
-                console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t排序依据键: NULL");
+                console.Debug($"排序依据键: NULL");
             else
-                console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t排序依据键: [{string.Join(", ", options.SortTargetKeys)}]");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t输出节名: {options.OutputSection}");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t注释键名: {options.SummaryKey}");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t键约束: {options.KeyConstraint}");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t值约束: {options.ValueConstraint}");
+                console.Debug($"排序依据键: [{string.Join(", ", options.SortTargetKeys)}]");
+            console.Debug($"输出节名: {options.OutputSection}");
+            console.Debug($"注释键名: {options.SummaryKey}");
+            console.Debug($"键约束: {options.KeyConstraint}");
+            console.Debug($"值约束: {options.ValueConstraint}");
 
 
-            console.Out.WriteLine($"[{DateTime.Now:O}]Info\t开始");
+            console.Info($"开始");
             await WorkAsync(options, console);
-            console.Out.WriteLine($"[{DateTime.Now:O}]Info\t完成");
+            console.Info($"完成");
         }
 
         public static async Task WorkAsync(IniSortSectionOptions options, IConsole console)
@@ -137,36 +138,36 @@ namespace Star.Project.Tools
 
             if (!string.IsNullOrEmpty(options.KeyConstraint))
             {
-                console.Out.WriteLine($"[{DateTime.Now:O}]Info\t已启用键约束");
+                console.Info($"已启用键约束");
                 if (!string.IsNullOrEmpty(options.ValueConstraint))
                 {
-                    console.Out.WriteLine($"[{DateTime.Now:O}]Info\t已启用值约束");
+                    console.Info($"已启用值约束");
                     Result = ini.Sections.Where(i => i.TryGetKey(options.KeyConstraint)?.Value.ToString().Equals(options.ValueConstraint) ?? false);
                 }
                 else
                 {
-                    console.Out.WriteLine($"[{DateTime.Now:O}]Info\t已启用键约束, 但未启用值约束");
+                    console.Info($"已启用键约束, 但未启用值约束");
                     Result = ini.Sections.Where(i => i.TryGetKey(options.KeyConstraint, out _));
                 }
             }
             if (options.Sort)
             {
-                console.Out.WriteLine($"[{DateTime.Now:O}]Info\t已启用排序");
+                console.Info($"已启用排序");
                 if (options.SortTargetKeys is null)
                 {
-                    console.Out.WriteLine($"[{DateTime.Now:O}]Warn\t排序列表不存在, 将按Section名排序");
+                    console.Warn($"排序列表不存在, 将按Section名排序");
                     Result = Result.OrderBy(i => i.Name);
                 }
                 if (options.SortTargetKeys.Length > 0)
                 {
-                    console.Out.WriteLine($"[{DateTime.Now:O}]Info\t排序列表为空, 将按Section名排序");
+                    console.Info($"排序列表为空, 将按Section名排序");
                     Result = Result.OrderBy(i => i.Name);
                 }
                 else
                 {
                     foreach (var key in options.SortTargetKeys)
                     {
-                        console.Out.WriteLine($"[{DateTime.Now:O}]Trace\t正在根据键 {key} 的值排序");
+                        console.Trace($"正在根据键 {key} 的值排序");
                         Result = Result.Where(i => i.TryGetKey(key, out _)).OrderBy(i => i.TryGetKey(key)?.Value.ToString());
                     }
                 }
@@ -206,7 +207,7 @@ namespace Star.Project.Tools
                     result.Add(IniKeyValuePair.CreateFullLine(key, value, summary));
                 }
 
-            console.Out.WriteLine($"[{DateTime.Now:O}]Info\t输出结果");
+            console.Info($"输出结果");
             if (!string.IsNullOrEmpty(options.OutputSection))
             {
                 console.Out.WriteLine($"[{options.OutputSection}]");

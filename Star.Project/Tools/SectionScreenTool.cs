@@ -11,6 +11,7 @@ using Shimakaze.Struct.Ini;
 
 using Star.Project.Data;
 using Star.Project.Data.Options;
+using Star.Project.Extensions;
 
 namespace Star.Project.Tools
 {
@@ -64,13 +65,13 @@ namespace Star.Project.Tools
             options.MatchCase = parseResult.ValueForOption<bool>(MATCH_CASE);
 
 
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t源文件: {source}");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t目标文件: {target}");
+            console.Debug($"源文件: {source}");
+            console.Debug($"目标文件: {target}");
             if (options.Sections is null)
-                console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t保留节: NULL");
+                console.Debug($"保留节: NULL");
             else
-                console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t保留节: [{string.Join(", ", options.Sections)}]");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t区分大小写: {options.MatchCase}");
+                console.Debug($"保留节: [{string.Join(", ", options.Sections)}]");
+            console.Debug($"区分大小写: {options.MatchCase}");
 
             await ScreeningAsync(options, console);
         }

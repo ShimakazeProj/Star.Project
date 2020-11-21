@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Shimakaze.Struct.Ini;
 
 using Star.Project.Data.Options;
+using Star.Project.Extensions;
 
 namespace Star.Project.Tools
 {
@@ -34,8 +35,8 @@ namespace Star.Project.Tools
             await using var ifs = source.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
             await using var ofs = target?.OpenWrite();
 
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t源文件: {source}");
-            console.Out.WriteLine($"[{DateTime.Now:O}]Debug\t目标文件: {target}");
+            console.Debug($"源文件: {source}");
+            console.Debug($"目标文件: {target}");
 
             await new IniMergeOptions
             {
@@ -68,7 +69,7 @@ namespace Star.Project.Tools
                             mainIni.Add(subSection);
                 }
             else
-                console.Out.WriteLine($"[{DateTime.Now:O}]Fatal\t不存在[#Include]节!");
+                console.Fatal($"不存在[#Include]节!");
 
             await mainIni.ToDocument().DeparseAsync(options.Output);
         }
