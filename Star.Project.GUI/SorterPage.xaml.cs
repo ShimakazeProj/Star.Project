@@ -31,7 +31,9 @@ namespace Star.Project.GUI
             InitializeComponent();
         }
 
-        public async void ApplyTemplate(Button sender, FileInfo file)
+        public string Help => "排序工具可以更容易的处理INI文件";
+
+        public async Task ApplyTemplate(Button sender, FileInfo file)
         {
             await using var fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
             using var sr = new StreamReader(fs);
@@ -45,73 +47,73 @@ namespace Star.Project.GUI
                 switch (item.Key.Trim().ToUpper())
                 {
                     case nameof(IniSorterTool.TARGET_SECTION):
-                        this.tbTargetSectionName.Text = item.Value;
+                        tbTargetSectionName.Text = item.Value;
                         break;
                     case nameof(IniSorterTool.PREFIX):
-                        this.tbPrefix.Text = item.Value;
+                        tbPrefix.Text = item.Value;
                         break;
                     case nameof(IniSorterTool.PREFIX_KEY):
-                        this.tbPrefixKey.Text = item.Value;
+                        tbPrefixKey.Text = item.Value;
                         break;
                     case nameof(IniSorterTool.START_NUM):
-                        this.tbFirst.Text = item.Value;
+                        tbFirst.Text = item.Value;
                         break;
                     case nameof(IniSorterTool.DIGIT):
-                        this.tbDigit.Text = item.Value;
+                        tbDigit.Text = item.Value;
                         break;
                     case nameof(IniSorterTool.SUMMARY_KEY):
-                        this.tbSummaryKey.Text = item.Value;
+                        tbSummaryKey.Text = item.Value;
                         break;
                     case nameof(IniSorterTool.SORT):
                         bool.TryParse(item.Value, out var b);
-                        this.cbSort.IsChecked = b;
+                        cbSort.IsOn = b;
                         break;
                     case nameof(IniSorterTool.SORT_KEYS):
-                        this.tbSortTargetKey.Text = item.Value;
+                        tbSortTargetKey.Text = item.Value;
                         break;
                     case nameof(IniSorterTool.CONSTRAINT_KEY):
-                        this.tbKeyConstraint.Text = item.Value;
+                        tbKeyConstraint.Text = item.Value;
                         break;
                     case nameof(IniSorterTool.CONSTRAINT_VALUE):
-                        this.tbValueConstraint.Text = item.Value;
+                        tbValueConstraint.Text = item.Value;
                         break;
                     default:
                         break;
                 }
             }
         }
-        public async void SaveTemplate(Button sender, FileInfo file)
+        public async Task SaveTemplate(Button sender, FileInfo file)
         {
             var temp = new List<(string Key, string Value)>();
-            if (!string.IsNullOrWhiteSpace(this.tbTargetSectionName.Text))
-                temp.Add((nameof(IniSorterTool.TARGET_SECTION), this.tbTargetSectionName.Text));
+            if (!string.IsNullOrWhiteSpace(tbTargetSectionName.Text))
+                temp.Add((nameof(IniSorterTool.TARGET_SECTION), tbTargetSectionName.Text));
 
-            if (!string.IsNullOrWhiteSpace(this.tbPrefix.Text))
-                temp.Add((nameof(IniSorterTool.PREFIX), this.tbPrefix.Text));
+            if (!string.IsNullOrWhiteSpace(tbPrefix.Text))
+                temp.Add((nameof(IniSorterTool.PREFIX), tbPrefix.Text));
 
-            if (!string.IsNullOrWhiteSpace(this.tbPrefixKey.Text))
-                temp.Add((nameof(IniSorterTool.PREFIX_KEY), this.tbPrefixKey.Text));
+            if (!string.IsNullOrWhiteSpace(tbPrefixKey.Text))
+                temp.Add((nameof(IniSorterTool.PREFIX_KEY), tbPrefixKey.Text));
 
-            if (!string.IsNullOrWhiteSpace(this.tbFirst.Text))
-                temp.Add((nameof(IniSorterTool.START_NUM), this.tbFirst.Value.ToString()));
+            if (!string.IsNullOrWhiteSpace(tbFirst.Text))
+                temp.Add((nameof(IniSorterTool.START_NUM), tbFirst.Value.ToString()));
 
-            if (!string.IsNullOrWhiteSpace(this.tbDigit.Text))
-                temp.Add((nameof(IniSorterTool.DIGIT), this.tbDigit.Value.ToString()));
+            if (!string.IsNullOrWhiteSpace(tbDigit.Text))
+                temp.Add((nameof(IniSorterTool.DIGIT), tbDigit.Value.ToString()));
 
-            if (!string.IsNullOrWhiteSpace(this.tbSummaryKey.Text))
-                temp.Add((nameof(IniSorterTool.SUMMARY_KEY), this.tbSummaryKey.Text));
+            if (!string.IsNullOrWhiteSpace(tbSummaryKey.Text))
+                temp.Add((nameof(IniSorterTool.SUMMARY_KEY), tbSummaryKey.Text));
 
-            if (this.cbSort.IsChecked ?? false)
+            if (cbSort.IsOn)
                 temp.Add((nameof(IniSorterTool.SORT), true.ToString()));
 
-            if (!string.IsNullOrWhiteSpace(this.tbSortTargetKey.Text))
-                temp.Add((nameof(IniSorterTool.SORT_KEYS), this.tbSortTargetKey.Text));
+            if (!string.IsNullOrWhiteSpace(tbSortTargetKey.Text))
+                temp.Add((nameof(IniSorterTool.SORT_KEYS), tbSortTargetKey.Text));
 
-            if (!string.IsNullOrWhiteSpace(this.tbKeyConstraint.Text))
-                temp.Add((nameof(IniSorterTool.CONSTRAINT_KEY), this.tbKeyConstraint.Text));
+            if (!string.IsNullOrWhiteSpace(tbKeyConstraint.Text))
+                temp.Add((nameof(IniSorterTool.CONSTRAINT_KEY), tbKeyConstraint.Text));
 
-            if (!string.IsNullOrWhiteSpace(this.tbValueConstraint.Text))
-                temp.Add((nameof(IniSorterTool.CONSTRAINT_VALUE), this.tbValueConstraint.Text));
+            if (!string.IsNullOrWhiteSpace(tbValueConstraint.Text))
+                temp.Add((nameof(IniSorterTool.CONSTRAINT_VALUE), tbValueConstraint.Text));
             await using var fs = file.OpenWrite();
             await using var sw = new StreamWriter(fs);
             foreach (var (Key, Value) in temp)
@@ -119,81 +121,82 @@ namespace Star.Project.GUI
             await sw.FlushAsync();
         }
 
-        public async void Start(Button sender, RoutedEventArgs e)
+        public async Task Start(Button sender, RoutedEventArgs e)
         {
             var btnText = sender.Content;
             (sender.IsEnabled, sender.Content) = (false, "正在处理");
             try
             {
-                if (string.IsNullOrWhiteSpace(this.ASB_Input.Text)) return;
+                if (string.IsNullOrWhiteSpace(ASB_Input.Text))
+                    throw new ArgumentNullException("未指定输入文件");
                 var list = new List<string>
                 {
                     IniSorterTool.NAME,
                     IniSorterTool.FILE_INPUT,
-                    $"\"{this.ASB_Input.Text}\""
+                    $"\"{ASB_Input.Text}\""
                 };
 
-                if (!string.IsNullOrWhiteSpace(this.ASB_Output.Text))
+                if (!string.IsNullOrWhiteSpace(ASB_Output.Text))
                 {
                     list.Add(IniSorterTool.FILE_OUTPUT);
-                    list.Add($"\"{this.ASB_Output.Text}\"");
+                    list.Add($"\"{ASB_Output.Text}\"");
                 }
 
-                if (!string.IsNullOrWhiteSpace(this.tbTargetSectionName.Text))
+                if (!string.IsNullOrWhiteSpace(tbTargetSectionName.Text))
                 {
                     list.Add(IniSorterTool.TARGET_SECTION);
-                    list.Add(this.tbTargetSectionName.Text);
+                    list.Add(tbTargetSectionName.Text);
                 }
 
-                if (!string.IsNullOrWhiteSpace(this.tbPrefix.Text))
+                if (!string.IsNullOrWhiteSpace(tbPrefix.Text))
                 {
                     list.Add(IniSorterTool.PREFIX);
-                    list.Add(this.tbPrefix.Text);
+                    list.Add(tbPrefix.Text);
                 }
 
-                if (!string.IsNullOrWhiteSpace(this.tbPrefixKey.Text))
+                if (!string.IsNullOrWhiteSpace(tbPrefixKey.Text))
                 {
                     list.Add(IniSorterTool.PREFIX_KEY);
-                    list.Add(this.tbPrefixKey.Text);
+                    list.Add(tbPrefixKey.Text);
                 }
 
-                if (!string.IsNullOrWhiteSpace(this.tbFirst.Text))
+                if (!string.IsNullOrWhiteSpace(tbFirst.Text))
                 {
                     list.Add(IniSorterTool.START_NUM);
-                    list.Add(this.tbFirst.Value.ToString());
+                    list.Add(tbFirst.Value.ToString());
                 }
 
-                if (!string.IsNullOrWhiteSpace(this.tbDigit.Text))
+                if (!string.IsNullOrWhiteSpace(tbDigit.Text))
                 {
                     list.Add(IniSorterTool.DIGIT);
-                    list.Add(this.tbDigit.Value.ToString());
+                    list.Add(tbDigit.Value.ToString());
                 }
 
-                if (!string.IsNullOrWhiteSpace(this.tbSummaryKey.Text))
+                if (!string.IsNullOrWhiteSpace(tbSummaryKey.Text))
                 {
                     list.Add(IniSorterTool.SUMMARY_KEY);
-                    list.Add(this.tbSummaryKey.Text);
+                    list.Add(tbSummaryKey.Text);
                 }
 
-                if (this.cbSort.IsChecked ?? false)
+                if (cbSort.IsOn)
                     list.Add(IniSorterTool.SORT);
 
-                if (!string.IsNullOrWhiteSpace(this.tbSortTargetKey.Text))
+                if (!string.IsNullOrWhiteSpace(tbSortTargetKey.Text))
                 {
                     list.Add(IniSorterTool.SORT_KEYS);
-                    list.Add(this.tbSortTargetKey.Text);
+                    list.Add(tbSortTargetKey.Text);
                 }
 
-                if (!string.IsNullOrWhiteSpace(this.tbKeyConstraint.Text))
+                if (!string.IsNullOrWhiteSpace(tbKeyConstraint.Text))
                 {
                     list.Add(IniSorterTool.CONSTRAINT_KEY);
-                    list.Add(this.tbKeyConstraint.Text);
+                    list.Add(tbKeyConstraint.Text);
                 }
 
-                if (!string.IsNullOrWhiteSpace(this.tbValueConstraint.Text))
+                if (!string.IsNullOrWhiteSpace(tbValueConstraint.Text))
                 {
                     list.Add(IniSorterTool.CONSTRAINT_VALUE);
-                    list.Add(this.tbValueConstraint.Text);
+                    list.Add(tbValueConstraint.Text);
                 }
 
                 await new ConsoleOutputDialog(new StringBuilder().AppendJoin(' ', list).ToString()).ShowAsync();
@@ -215,7 +218,7 @@ namespace Star.Project.GUI
             {
                 var fileInfo = new FileInfo(ofd.FileName);
                 sender.Text = fileInfo.FullName;
-                this.ASB_Output.Text = fileInfo.FullName.Substring(0, fileInfo.FullName.Length - fileInfo.Extension.Length) + ".out.ini";
+                ASB_Output.Text = fileInfo.FullName.Substring(0, fileInfo.FullName.Length - fileInfo.Extension.Length) + ".out.ini";
             }
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.CommandLine;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -25,13 +26,14 @@ namespace Star.Project.GUI
     /// <summary>
     /// FormaterPage.xaml 的交互逻辑
     /// </summary>
-    public partial class SectionScreenPage : IToolPage
+    public partial class SectionFilterPage : IToolPage
     {
-        public SectionScreenPage()
+        public SectionFilterPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
-        public async void ApplyTemplate(Button sender, FileInfo file)
+        public string Help => "节过滤器可以帮助您更方便的过滤INI节";
+        public async Task ApplyTemplate(Button sender, FileInfo file)
         {
             await using var fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
             using var sr = new StreamReader(fs);
@@ -45,25 +47,25 @@ namespace Star.Project.GUI
                 switch (item.Key.Trim().ToUpper())
                 {
                     case nameof(SectionScreenTool.KEEP_SECTIONS):
-                        this.ASB_Keep_Sections.Text = item.Value;
+                        ASB_Keep_Sections.Text = item.Value;
                         break;
                     case nameof(SectionScreenTool.MATCH_CASE):
                         bool.TryParse(item.Value, out var b);
-                        this.CB_MatchCase.IsChecked = b;
+                        CB_MatchCase.IsOn = b;
                         break;
                     default:
                         break;
                 }
             }
         }
-        public async void SaveTemplate(Button sender, FileInfo file)
+        public async Task SaveTemplate(Button sender, FileInfo file)
         {
             var temp = new List<(string Key, string Value)>();
 
-            if (!string.IsNullOrWhiteSpace(this.ASB_Keep_Sections.Text))
-                temp.Add((nameof(SectionScreenTool.KEEP_SECTIONS), this.ASB_Keep_Sections.Text));
+            if (!string.IsNullOrWhiteSpace(ASB_Keep_Sections.Text))
+                temp.Add((nameof(SectionScreenTool.KEEP_SECTIONS), ASB_Keep_Sections.Text));
 
-            if (this.CB_MatchCase.IsChecked ?? false)
+            if (CB_MatchCase.IsOn)
                 temp.Add((nameof(SectionScreenTool.MATCH_CASE), true.ToString()));
 
             await using var fs = file.OpenWrite();
@@ -73,33 +75,34 @@ namespace Star.Project.GUI
             await sw.FlushAsync();
         }
 
-        public async void Start(Button sender, RoutedEventArgs e)
+        public async Task Start(Button sender, RoutedEventArgs e)
         {
             var btnText = sender.Content;
             (sender.IsEnabled, sender.Content) = (false, "正在处理");
             try
             {
-                if (string.IsNullOrWhiteSpace(this.ASB_Input.Text)) return;
+                if (string.IsNullOrWhiteSpace(ASB_Input.Text))
+                    throw new ArgumentNullException("未指定输入文件");
                 var list = new List<string>
                 {
                     SectionScreenTool.NAME,
                     SectionScreenTool.FILE_INPUT,
-                    $"\"{this.ASB_Input.Text}\""
+                    $"\"{ASB_Input.Text}\""
                 };
 
-                if (!string.IsNullOrWhiteSpace(this.ASB_Output.Text))
+                if (!string.IsNullOrWhiteSpace(ASB_Output.Text))
                 {
                     list.Add(SectionScreenTool.FILE_OUTPUT);
-                    list.Add($"\"{this.ASB_Output.Text}\"");
+                    list.Add($"\"{ASB_Output.Text}\"");
                 }
 
-                if (!string.IsNullOrWhiteSpace(this.ASB_Keep_Sections.Text))
+                if (!string.IsNullOrWhiteSpace(ASB_Keep_Sections.Text))
                 {
                     list.Add(SectionScreenTool.KEEP_SECTIONS);
-                    list.AddRange(this.ASB_Keep_Sections.Text.Split(';'));
+                    list.AddRange(ASB_Keep_Sections.Text.Split(';'));
                 }
 
-                if (this.CB_MatchCase.IsChecked ?? false)
+                if (CB_MatchCase.IsOn)
                 {
                     list.Add(SectionScreenTool.MATCH_CASE);
                 }
@@ -122,7 +125,7 @@ namespace Star.Project.GUI
             {
                 var fileInfo = new FileInfo(ofd.FileName);
                 sender.Text = fileInfo.FullName;
-                this.ASB_Output.Text = fileInfo.FullName.Substring(0, fileInfo.FullName.Length - fileInfo.Extension.Length) + ".out.ini";
+                ASB_Output.Text = fileInfo.FullName.Substring(0, fileInfo.FullName.Length - fileInfo.Extension.Length) + ".out.ini";
             }
         }
 

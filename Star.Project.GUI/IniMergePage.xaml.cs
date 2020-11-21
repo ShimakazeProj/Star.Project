@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -31,30 +32,34 @@ namespace Star.Project.GUI
             InitializeComponent();
         }
 
+        public string Help => "INI 合并工具可以通过读取INI文件中已存在的[#Include]节中定义的文件, 并将其整合成一个文件";
 
-        public void ApplyTemplate(Button sender, FileInfo file)
+        public async Task ApplyTemplate(Button sender, FileInfo file)
         {
+            await Task.Delay(0);
         }
-        public void SaveTemplate(Button sender, FileInfo file)
+        public async Task SaveTemplate(Button sender, FileInfo file)
         {
+            await Task.Delay(0);
         }
 
-        public async void Start(Button sender, RoutedEventArgs e)
+        public async Task Start(Button sender, RoutedEventArgs e)
         {
             var btnText = sender.Content;
             (sender.IsEnabled, sender.Content) = (false, "正在处理");
             try
             {
-                if (string.IsNullOrWhiteSpace(this.ASB_Input.Text)
-                    || string.IsNullOrWhiteSpace(this.ASB_Output.Text)) return;
+                if (string.IsNullOrWhiteSpace(ASB_Input.Text)
+                    || string.IsNullOrWhiteSpace(ASB_Output.Text))
+                    throw new ArgumentNullException("未指定输入或输出文件");
 
                 var list = new List<string>
                 {
                     IniMergeTool.NAME,
                     IniMergeTool.FILE_INPUT,
-                    $"\"{this.ASB_Input.Text}\"",
+                    $"\"{ASB_Input.Text}\"",
                     IniMergeTool.FILE_OUTPUT,
-                    $"\"{this.ASB_Output.Text}\"",
+                    $"\"{ASB_Output.Text}\"",
                 };
 
                 await new ConsoleOutputDialog(new StringBuilder().AppendJoin(' ', list).ToString()).ShowAsync();

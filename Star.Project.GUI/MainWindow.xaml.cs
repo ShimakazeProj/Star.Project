@@ -29,7 +29,7 @@ namespace Star.Project.GUI
         public MainWindow()
         {
             InitializeComponent();
-            this.NavControl.SelectedItem = this.NavControl.MenuItems[0];
+            NavControl.SelectedItem = NavControl.MenuItems[0];
             App.Current.DispatcherUnhandledException += this.Current_DispatcherUnhandledException;
         }
 
@@ -40,14 +40,9 @@ namespace Star.Project.GUI
 
         private void ToggleTheme(object sender, RoutedEventArgs e)
         {
-            if (ThemeManager.Current.ActualApplicationTheme == ApplicationTheme.Dark)
-            {
-                ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
-            }
-            else
-            {
-                ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
-            }
+            ThemeManager.Current.ApplicationTheme = ThemeManager.Current.ActualApplicationTheme == ApplicationTheme.Dark
+                ? (ApplicationTheme?)ApplicationTheme.Light
+                : (ApplicationTheme?)ApplicationTheme.Dark;
         }
 
         private void Window_ActualThemeChanged(object sender, RoutedEventArgs e)
@@ -63,20 +58,22 @@ namespace Star.Project.GUI
             if ((select.Tag as Type) == lastSelected) return;
             if (args.IsSettingsSelected)
             {
-                this.ContentFrame.Navigate(lastSelected = typeof(SettingsPage));
+                ContentFrame.Navigate(lastSelected = typeof(SettingsPage));
+                commandBar.Visibility = Visibility.Collapsed;
             }
             else
             {
-                this.ContentFrame.Navigate(lastSelected = (select.Tag as Type));
-                this.LoadTemplate((select.Tag as Type).Name);
+                ContentFrame.Navigate(lastSelected = (select.Tag as Type));
+                commandBar.Visibility = Visibility.Visible;
+                _ = LoadTemplate((select.Tag as Type).Name);
             }
         }
-        private async void LoadTemplate(string name)
+        private async Task LoadTemplate(string name)
         {
-            await this.templates.Dispatcher.InvokeAsync(() =>
+            await commandBar.Dispatcher.InvokeAsync(() =>
             {
-                while (this.templates.SecondaryCommands[2] is AppBarButton)
-                    this.templates.SecondaryCommands.RemoveAt(2);
+                while (commandBar.SecondaryCommands.Count > 2)
+                    commandBar.SecondaryCommands.RemoveAt(2);
             });
             var dir = new DirectoryInfo(Path.Combine("Template", name));
 
@@ -92,13 +89,13 @@ namespace Star.Project.GUI
                     Icon = new SymbolIcon(Symbol.ImportAll),
                     Tag = files[i]
                 };
-                btn.Click += this.TemplateItem_Click;
-                await this.templates.Dispatcher.InvokeAsync(() => this.templates.SecondaryCommands.Insert(i + 2, btn));
+                btn.Click += TemplateItem_Click;
+                await commandBar.Dispatcher.InvokeAsync(() => commandBar.SecondaryCommands.Insert(i + 2, btn));
             }
             return;
 
         NoTemplate:
-            await this.templates.Dispatcher.InvokeAsync(() => this.templates.SecondaryCommands.Insert(2, new AppBarButton
+            await commandBar.Dispatcher.InvokeAsync(() => commandBar.SecondaryCommands.Insert(2, new AppBarButton
             {
                 Label = "暂无保存的模板",
                 Icon = new SymbolIcon(Symbol.Cancel),
@@ -118,9 +115,9 @@ namespace Star.Project.GUI
         }
         private async void SaveTemplate_Click(object sender, RoutedEventArgs e)
         {
-            var dir = new DirectoryInfo(Path.Combine("Template", ((this.NavControl.SelectedItem as NavigationViewItem).Tag as Type).Name));
+            var dir = new DirectoryInfo(Path.Combine("Template", ((NavControl.SelectedItem as NavigationViewItem).Tag as Type).Name));
             if (!dir.Exists) dir.Create();
-            if (this.ContentFrame.Content is IToolPage page)
+            if (ContentFrame.Content is IToolPage page)
             {
                 var tb = new AutoSuggestBox
                 {
@@ -141,10 +138,10 @@ namespace Star.Project.GUI
                         break;
                     case ContentDialogResult.Primary:
                         if (string.IsNullOrEmpty(tb.Text.Trim())) goto ShowDialog;
-                        if (this.templates.SecondaryCommands[2] is AppBarButton btn && !btn.IsEnabled)
-                            await this.templates.Dispatcher.InvokeAsync(() => this.templates.SecondaryCommands.RemoveAt(2));
+                        if (commandBar.SecondaryCommands[2] is AppBarButton btn && !btn.IsEnabled)
+                            await commandBar.Dispatcher.InvokeAsync(() => commandBar.SecondaryCommands.RemoveAt(2));
                         var file = new FileInfo(Path.Combine(dir.FullName, tb.Text.Trim()));
-                        page.SaveTemplate(sender as Button, file);
+                        await page.SaveTemplate(sender as Button, file);
 
                         btn = new AppBarButton
                         {
@@ -153,7 +150,7 @@ namespace Star.Project.GUI
                             Tag = file
                         };
                         btn.Click += this.TemplateItem_Click;
-                        await this.templates.Dispatcher.InvokeAsync(() => this.templates.SecondaryCommands.Insert(this.templates.SecondaryCommands.Count - 2, btn));
+                        await commandBar.Dispatcher.InvokeAsync(() => commandBar.SecondaryCommands.Insert(commandBar.SecondaryCommands.Count - 2, btn));
 
                         break;
                     case ContentDialogResult.Secondary:
@@ -165,20 +162,47 @@ namespace Star.Project.GUI
 
         private async void TemplateManager_Click(object sender, RoutedEventArgs e)
         {
-            await new TemplateManagerDialog(this.templates.SecondaryCommands.Where(i => i is AppBarButton btn && btn.Tag is FileInfo)
+            await new TemplateManagerDialog(commandBar.SecondaryCommands.Where(i => i is AppBarButton btn && btn.Tag is FileInfo)
                                                                             .Select(i => (i as AppBarButton).Tag as FileInfo)).ShowAsync();
-            this.LoadTemplate(this.ContentFrame.Content.GetType().Name);
+            _ = LoadTemplate(ContentFrame.Content.GetType().Name);
         }
 
-        private void RunButton_Click(object sender, RoutedEventArgs e)
+        private async void RunButton_Click(object sender, RoutedEventArgs e)
         {
             switch (ContentFrame.Content)
             {
                 case IToolPage page:
-                    page.Start(sender as Button, e);
+                    try
+                    {
+                       await page.Start(sender as Button, e);
+                    }
+                    catch (Exception ex)
+                    {
+                        await new ContentDialog
+                        {
+                            Title = "错误信息",
+                            Content = ex.Message,
+                            CloseButtonText = "关闭"
+                        }.ShowAsync();
+                    }
+
                     break;
             }
         }
 
+        private async void HelpButton_Click(object sender, RoutedEventArgs e)
+        {
+            switch (ContentFrame.Content)
+            {
+                case IToolPage page:
+                    await new ContentDialog
+                    {
+                        Title = "帮助",
+                        Content = page.Help,
+                        CloseButtonText = "关闭"
+                    }.ShowAsync();
+                    break;
+            }
+        }
     }
 }

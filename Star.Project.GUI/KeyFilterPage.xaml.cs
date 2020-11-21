@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.CommandLine;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -24,13 +25,16 @@ namespace Star.Project.GUI
     /// <summary>
     /// FormaterPage.xaml 的交互逻辑
     /// </summary>
-    public partial class KeyScreenPage : IToolPage
+    public partial class KeyFilterPage : IToolPage
     {
-        public KeyScreenPage()
+        public KeyFilterPage()
         {
             InitializeComponent();
         }
-        public async void ApplyTemplate(Button sender, FileInfo file)
+
+        public string Help => "键过滤器可以帮助您更方便的过滤INI键";
+
+        public async Task ApplyTemplate(Button sender, FileInfo file)
         {
             await using var fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
             using var sr = new StreamReader(fs);
@@ -44,37 +48,37 @@ namespace Star.Project.GUI
                 switch (item.Key.Trim().ToUpper())
                 {
                     case nameof(KeyScreenTool.KEEP_KEYS):
-                        this.ASB_Keep_Keys.Text = item.Value;
+                        ASB_Keep_Keys.Text = item.Value;
                         break;
                     case nameof(KeyScreenTool.MATCH_CASE):
                         bool.TryParse(item.Value, out var b);
-                        this.CB_MatchCase.IsChecked = b;
+                        CB_MatchCase.IsOn = b;
                         break;
                     case nameof(KeyScreenTool.IGNORE_SECTIONS):
-                        this.ASB_Ignore_Sections.Text = item.Value;
+                        ASB_Ignore_Sections.Text = item.Value;
                         break;
                     case nameof(KeyScreenTool.SORT_KEY):
                         bool.TryParse(item.Value, out b);
-                        this.CB_SortKey.IsChecked = b;
+                        CB_SortKey.IsOn = b;
                         break;
                     default:
                         break;
                 }
             }
         }
-        public async void SaveTemplate(Button sender, FileInfo file)
+        public async Task SaveTemplate(Button sender, FileInfo file)
         {
             var temp = new List<(string Key, string Value)>();
-            if (!string.IsNullOrWhiteSpace(this.ASB_Keep_Keys.Text))
-                temp.Add((nameof(KeyScreenTool.KEEP_KEYS), this.ASB_Keep_Keys.Text));
+            if (!string.IsNullOrWhiteSpace(ASB_Keep_Keys.Text))
+                temp.Add((nameof(KeyScreenTool.KEEP_KEYS), ASB_Keep_Keys.Text));
 
-            if (this.CB_MatchCase.IsChecked ?? false)
+            if (CB_MatchCase.IsOn)
                 temp.Add((nameof(KeyScreenTool.MATCH_CASE), true.ToString()));
 
-            if (!string.IsNullOrWhiteSpace(this.ASB_Ignore_Sections.Text))
-                temp.Add((nameof(KeyScreenTool.IGNORE_SECTIONS), this.ASB_Ignore_Sections.Text));
+            if (!string.IsNullOrWhiteSpace(ASB_Ignore_Sections.Text))
+                temp.Add((nameof(KeyScreenTool.IGNORE_SECTIONS), ASB_Ignore_Sections.Text));
 
-            if (this.CB_SortKey.IsChecked ?? false)
+            if (CB_SortKey.IsOn)
                 temp.Add((nameof(KeyScreenTool.SORT_KEY), true.ToString()));
 
             await using var fs = file.OpenWrite();
@@ -84,34 +88,36 @@ namespace Star.Project.GUI
             await sw.FlushAsync();
         }
 
-        public async void Start(Button sender, RoutedEventArgs e)
+        public async Task Start(Button sender, RoutedEventArgs e)
         {
             var btnText = sender.Content;
             (sender.IsEnabled, sender.Content) = (false, "正在处理");
             try
             {
-                if (string.IsNullOrWhiteSpace(this.ASB_Input.Text)
-                    || string.IsNullOrWhiteSpace(this.ASB_Output.Text)
-                    || string.IsNullOrWhiteSpace(this.ASB_Keep_Keys.Text)) return;
+                if (string.IsNullOrWhiteSpace(ASB_Input.Text)
+                    || string.IsNullOrWhiteSpace(ASB_Output.Text))
+                    throw new ArgumentNullException("未指定输入或输出文件");
+                if (string.IsNullOrWhiteSpace(ASB_Keep_Keys.Text))
+                    throw new ArgumentNullException("未指定将要保留的内容");
 
                 var list = new List<string>
                 {
                     KeyScreenTool.NAME,
                     KeyScreenTool.FILE_INPUT,
-                    $"\"{this.ASB_Input.Text}\"",
+                    $"\"{ASB_Input.Text}\"",
                     KeyScreenTool.FILE_OUTPUT,
-                    $"\"{this.ASB_Output.Text}\"",
+                    $"\"{ASB_Output.Text}\"",
                     KeyScreenTool.KEEP_KEYS,
-                    this.ASB_Keep_Keys.Text.Replace(';','\x20')
+                    ASB_Keep_Keys.Text.Replace(';','\x20')
                 };
 
-                if (!string.IsNullOrWhiteSpace(this.ASB_Ignore_Sections.Text))
+                if (!string.IsNullOrWhiteSpace(ASB_Ignore_Sections.Text))
                 {
                     list.Add(KeyScreenTool.IGNORE_SECTIONS);
-                    list.Add(this.ASB_Ignore_Sections.Text.Replace(';', '\x20'));
+                    list.Add(ASB_Ignore_Sections.Text.Replace(';', '\x20'));
                 }
-                if (this.CB_MatchCase.IsChecked ?? false) list.Add(KeyScreenTool.MATCH_CASE);
-                if (this.CB_SortKey.IsChecked ?? false) list.Add(KeyScreenTool.SORT_KEY);
+                if (CB_MatchCase.IsOn) list.Add(KeyScreenTool.MATCH_CASE);
+                if (CB_SortKey.IsOn) list.Add(KeyScreenTool.SORT_KEY);
 
                 await new ConsoleOutputDialog(new StringBuilder().AppendJoin(' ', list).ToString()).ShowAsync();
             }
@@ -131,7 +137,7 @@ namespace Star.Project.GUI
             {
                 var fileInfo = new FileInfo(ofd.FileName);
                 sender.Text = fileInfo.FullName;
-                this.ASB_Output.Text = fileInfo.FullName.Substring(0, fileInfo.FullName.Length - fileInfo.Extension.Length) + ".out.ini";
+                ASB_Output.Text = fileInfo.FullName.Substring(0, fileInfo.FullName.Length - fileInfo.Extension.Length) + ".out.ini";
             }
         }
 
