@@ -75,70 +75,30 @@ namespace Star.Project.GUI
             await sw.FlushAsync();
         }
 
-        public async Task Start(Button sender, RoutedEventArgs e)
+        public async Task Start(object sender, StartEventArgs e)
         {
-            var btnText = sender.Content;
-            (sender.IsEnabled, sender.Content) = (false, "正在处理");
-            try
+            var list = new List<string>
             {
-                if (string.IsNullOrWhiteSpace(ASB_Input.Text))
-                    throw new ArgumentNullException("未指定输入文件");
-                var list = new List<string>
-                {
-                    SectionScreenTool.NAME,
-                    SectionScreenTool.FILE_INPUT,
-                    $"\"{ASB_Input.Text}\""
-                };
-
-                if (!string.IsNullOrWhiteSpace(ASB_Output.Text))
-                {
-                    list.Add(SectionScreenTool.FILE_OUTPUT);
-                    list.Add($"\"{ASB_Output.Text}\"");
-                }
-
-                if (!string.IsNullOrWhiteSpace(ASB_Keep_Sections.Text))
-                {
-                    list.Add(SectionScreenTool.KEEP_SECTIONS);
-                    list.AddRange(ASB_Keep_Sections.Text.Split(';'));
-                }
-
-                if (CB_MatchCase.IsOn)
-                {
-                    list.Add(SectionScreenTool.MATCH_CASE);
-                }
-
-                await new ConsoleOutputDialog(new StringBuilder().AppendJoin(' ', list).ToString()).ShowAsync();
-            }
-            finally
-            {
-                (sender.IsEnabled, sender.Content) = (true, btnText);
-            }
-        }
-
-        private void Input_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-            var ofd = new OpenFileDialog
-            {
-                Filter = "INI文件|*.ini|所有文件|*.*"
+                SectionScreenTool.NAME,
+                SectionScreenTool.FILE_INPUT,
+                $"\"{e.InputFile}\"",
+                SectionScreenTool.FILE_OUTPUT,
+                $"\"{e.OutputFile}\""
             };
-            if (ofd.ShowDialog() ?? false)
-            {
-                var fileInfo = new FileInfo(ofd.FileName);
-                sender.Text = fileInfo.FullName;
-                ASB_Output.Text = fileInfo.FullName.Substring(0, fileInfo.FullName.Length - fileInfo.Extension.Length) + ".out.ini";
-            }
-        }
 
-        private void Output_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-            var sfd = new SaveFileDialog
+            if (!string.IsNullOrWhiteSpace(ASB_Keep_Sections.Text))
             {
-                Filter = "INI文件|*.ini|所有文件|*.*"
-            };
-            if (sfd.ShowDialog() ?? false)
-            {
-                sender.Text = sfd.FileName;
+                list.Add(SectionScreenTool.KEEP_SECTIONS);
+                list.AddRange(ASB_Keep_Sections.Text.Split(';'));
             }
+
+            if (CB_MatchCase.IsOn)
+            {
+                list.Add(SectionScreenTool.MATCH_CASE);
+            }
+
+            await new ConsoleOutputDialog(new StringBuilder().AppendJoin(' ', list).ToString()).ShowAsync();
+
         }
     }
 }

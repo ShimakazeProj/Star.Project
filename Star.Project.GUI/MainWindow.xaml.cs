@@ -14,6 +14,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 
+using Microsoft.Win32;
+
 using ModernWpf;
 using ModernWpf.Controls;
 
@@ -31,29 +33,48 @@ namespace Star.Project.GUI
             InitializeComponent();
             NavControl.SelectedItem = NavControl.MenuItems[0];
             App.Current.DispatcherUnhandledException += this.Current_DispatcherUnhandledException;
+            ABTB_Theme.Label = ThemeManager.Current.ActualApplicationTheme == ApplicationTheme.Dark ? "浅色主题" : "深色主题";
+            ABTB_Theme.Checked += ToggleTheme;
+            ABTB_Theme.Unchecked += ToggleTheme;
         }
 
+        /// <summary>
+        /// 未处理异常调度
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Current_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             File.WriteAllText("exception.log", e.Exception.ToString());
         }
 
+        /// <summary>
+        /// 切换主题
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ToggleTheme(object sender, RoutedEventArgs e)
         {
             ThemeManager.Current.ApplicationTheme = ThemeManager.Current.ActualApplicationTheme == ApplicationTheme.Dark
                 ? (ApplicationTheme?)ApplicationTheme.Light
                 : (ApplicationTheme?)ApplicationTheme.Dark;
         }
+        private static Brush defaultASBBrush;
 
+        /// <summary>
+        /// 窗口主题被修改
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_ActualThemeChanged(object sender, RoutedEventArgs e)
         {
             Debug.WriteLine(ThemeManager.GetActualTheme(this));
         }
         private Type lastSelected = null;
-        private bool igone = false;
-        private void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+        private bool ignore = false;
+        private async void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            if (igone) return;
+            if (ignore) return;
             var select = args.SelectedItem as NavigationViewItem;
             if ((select.Tag as Type) == lastSelected) return;
             if (args.IsSettingsSelected)
@@ -65,16 +86,12 @@ namespace Star.Project.GUI
             {
                 ContentFrame.Navigate(lastSelected = (select.Tag as Type));
                 commandBar.Visibility = Visibility.Visible;
-                _ = LoadTemplate((select.Tag as Type).Name);
+                await LoadTemplate((select.Tag as Type).Name);
             }
         }
         private async Task LoadTemplate(string name)
         {
-            await commandBar.Dispatcher.InvokeAsync(() =>
-            {
-                while (commandBar.SecondaryCommands.Count > 2)
-                    commandBar.SecondaryCommands.RemoveAt(2);
-            });
+            await CBF_Template.Dispatcher.InvokeAsync(CBF_Template.SecondaryCommands.Clear);
             var dir = new DirectoryInfo(Path.Combine("Template", name));
 
             if (!dir.Exists) goto NoTemplate;
@@ -90,12 +107,12 @@ namespace Star.Project.GUI
                     Tag = files[i]
                 };
                 btn.Click += TemplateItem_Click;
-                await commandBar.Dispatcher.InvokeAsync(() => commandBar.SecondaryCommands.Insert(i + 2, btn));
+                await CBF_Template.Dispatcher.InvokeAsync(() => CBF_Template.SecondaryCommands.Add(btn));
             }
             return;
 
         NoTemplate:
-            await commandBar.Dispatcher.InvokeAsync(() => commandBar.SecondaryCommands.Insert(2, new AppBarButton
+            await CBF_Template.Dispatcher.InvokeAsync(() => CBF_Template.SecondaryCommands.Add(new AppBarButton
             {
                 Label = "暂无保存的模板",
                 Icon = new SymbolIcon(Symbol.Cancel),
@@ -103,13 +120,13 @@ namespace Star.Project.GUI
             }));
         }
 
-        private void TemplateItem_Click(object sender, RoutedEventArgs e)
+        private async void TemplateItem_Click(object sender, RoutedEventArgs e)
         {
             switch (ContentFrame.Content)
             {
                 case IToolPage page:
                     var btn = sender as Button;
-                    page.ApplyTemplate(btn, btn.Tag as FileInfo);
+                    await page.ApplyTemplate(btn, btn.Tag as FileInfo);
                     break;
             }
         }
@@ -121,7 +138,7 @@ namespace Star.Project.GUI
             {
                 var tb = new AutoSuggestBox
                 {
-                    Header = "请输入模板名"
+                    PlaceholderText = "请输入模板名"
                 };
                 var dialog = new ContentDialog
                 {
@@ -137,7 +154,12 @@ namespace Star.Project.GUI
                     case ContentDialogResult.None:
                         break;
                     case ContentDialogResult.Primary:
-                        if (string.IsNullOrEmpty(tb.Text.Trim())) goto ShowDialog;
+                        if (string.IsNullOrEmpty(tb.Text.Trim()))
+                        {
+                            tb.Header = "模板名不能为空";
+                            tb.BorderBrush = Brushes.Red;
+                            goto ShowDialog;
+                        }
                         if (commandBar.SecondaryCommands[2] is AppBarButton btn && !btn.IsEnabled)
                             await commandBar.Dispatcher.InvokeAsync(() => commandBar.SecondaryCommands.RemoveAt(2));
                         var file = new FileInfo(Path.Combine(dir.FullName, tb.Text.Trim()));
@@ -164,17 +186,40 @@ namespace Star.Project.GUI
         {
             await new TemplateManagerDialog(commandBar.SecondaryCommands.Where(i => i is AppBarButton btn && btn.Tag is FileInfo)
                                                                             .Select(i => (i as AppBarButton).Tag as FileInfo)).ShowAsync();
-            _ = LoadTemplate(ContentFrame.Content.GetType().Name);
+            await LoadTemplate(ContentFrame.Content.GetType().Name);
         }
 
-        private async void RunButton_Click(object sender, RoutedEventArgs e)
+        private async void RunButton_Click(object o, RoutedEventArgs e)
         {
+            var sender = o as AppBarButton;
             switch (ContentFrame.Content)
             {
                 case IToolPage page:
+                    var flag_exit = false;
+
+                    sender.Label = "正在处理";
+                    sender.IsEnabled = false;
+                    sender.Icon = new SymbolIcon(Symbol.Pause);
                     try
                     {
-                       await page.Start(sender as Button, e);
+                        if (string.IsNullOrWhiteSpace(ASB_Input.Text))
+                        {
+                            fileExpander.IsExpanded = true;
+                            ASB_IsNullWarn(ASB_Input);
+                            flag_exit = true;
+                        }
+                        if (string.IsNullOrWhiteSpace(ASB_Output.Text))
+                        {
+                            fileExpander.IsExpanded = true;
+                            ASB_IsNullWarn(ASB_Output);
+                            flag_exit = true;
+                        }
+                        if (flag_exit)
+                        {
+                            throw new ArgumentNullException("未指定文件");
+                        }
+
+                        await page.Start(this, new StartEventArgs(sender, e, ASB_Input.Text, ASB_Output.Text));
                     }
                     catch (Exception ex)
                     {
@@ -185,10 +230,17 @@ namespace Star.Project.GUI
                             CloseButtonText = "关闭"
                         }.ShowAsync();
                     }
+                    finally
+                    {
+                        sender.Label = "执行";
+                        sender.IsEnabled = true;
+                        sender.Icon = new SymbolIcon(Symbol.Play);
+                    }
 
                     break;
             }
         }
+
 
         private async void HelpButton_Click(object sender, RoutedEventArgs e)
         {
@@ -202,6 +254,47 @@ namespace Star.Project.GUI
                         CloseButtonText = "关闭"
                     }.ShowAsync();
                     break;
+            }
+        }
+        private void Input_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            var ofd = new OpenFileDialog
+            {
+                Filter = "INI文件|*.ini|所有文件|*.*",
+                Title = "请选择一个源文件"
+            };
+            if (ofd.ShowDialog() ?? false)
+            {
+                var fileInfo = new FileInfo(ofd.FileName);
+                sender.Text = fileInfo.FullName;
+                ASB_Output.Text = fileInfo.FullName.Substring(0, fileInfo.FullName.Length - fileInfo.Extension.Length) + ".out.ini";
+            }
+        }
+
+        private void Output_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            var sfd = new SaveFileDialog
+            {
+                Filter = "INI文件|*.ini|所有文件|*.*",
+                Title = "请选择目标文件保存位置"
+            };
+            if (sfd.ShowDialog() ?? false)
+            {
+                sender.Text = sfd.FileName;
+            }
+        }
+        internal static void ASB_IsNullWarn(AutoSuggestBox sender)
+        {
+            defaultASBBrush = sender.BorderBrush;
+            sender.BorderBrush = Brushes.Red;
+            sender.TextChanged += ASB_IsNullWarn_TextChanged;
+        }
+        private static void ASB_IsNullWarn_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (sender.BorderBrush == Brushes.Red)
+            {
+                sender.BorderBrush = defaultASBBrush;
+                sender.TextChanged -= ASB_IsNullWarn_TextChanged;
             }
         }
     }

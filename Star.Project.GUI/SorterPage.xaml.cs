@@ -121,117 +121,75 @@ namespace Star.Project.GUI
             await sw.FlushAsync();
         }
 
-        public async Task Start(Button sender, RoutedEventArgs e)
+        public async Task Start(object sender, StartEventArgs e)
         {
-            var btnText = sender.Content;
-            (sender.IsEnabled, sender.Content) = (false, "正在处理");
-            try
+            var list = new List<string>
             {
-                if (string.IsNullOrWhiteSpace(ASB_Input.Text))
-                    throw new ArgumentNullException("未指定输入文件");
-                var list = new List<string>
-                {
-                    IniSorterTool.NAME,
-                    IniSorterTool.FILE_INPUT,
-                    $"\"{ASB_Input.Text}\""
-                };
-
-                if (!string.IsNullOrWhiteSpace(ASB_Output.Text))
-                {
-                    list.Add(IniSorterTool.FILE_OUTPUT);
-                    list.Add($"\"{ASB_Output.Text}\"");
-                }
-
-                if (!string.IsNullOrWhiteSpace(tbTargetSectionName.Text))
-                {
-                    list.Add(IniSorterTool.TARGET_SECTION);
-                    list.Add(tbTargetSectionName.Text);
-                }
-
-                if (!string.IsNullOrWhiteSpace(tbPrefix.Text))
-                {
-                    list.Add(IniSorterTool.PREFIX);
-                    list.Add(tbPrefix.Text);
-                }
-
-                if (!string.IsNullOrWhiteSpace(tbPrefixKey.Text))
-                {
-                    list.Add(IniSorterTool.PREFIX_KEY);
-                    list.Add(tbPrefixKey.Text);
-                }
-
-                if (!string.IsNullOrWhiteSpace(tbFirst.Text))
-                {
-                    list.Add(IniSorterTool.START_NUM);
-                    list.Add(tbFirst.Value.ToString());
-                }
-
-                if (!string.IsNullOrWhiteSpace(tbDigit.Text))
-                {
-                    list.Add(IniSorterTool.DIGIT);
-                    list.Add(tbDigit.Value.ToString());
-                }
-
-                if (!string.IsNullOrWhiteSpace(tbSummaryKey.Text))
-                {
-                    list.Add(IniSorterTool.SUMMARY_KEY);
-                    list.Add(tbSummaryKey.Text);
-                }
-
-                if (cbSort.IsOn)
-                    list.Add(IniSorterTool.SORT);
-
-                if (!string.IsNullOrWhiteSpace(tbSortTargetKey.Text))
-                {
-                    list.Add(IniSorterTool.SORT_KEYS);
-                    list.Add(tbSortTargetKey.Text);
-                }
-
-                if (!string.IsNullOrWhiteSpace(tbKeyConstraint.Text))
-                {
-                    list.Add(IniSorterTool.CONSTRAINT_KEY);
-                    list.Add(tbKeyConstraint.Text);
-                }
-
-                if (!string.IsNullOrWhiteSpace(tbValueConstraint.Text))
-                {
-                    list.Add(IniSorterTool.CONSTRAINT_VALUE);
-                    list.Add(tbValueConstraint.Text);
-                }
-
-                await new ConsoleOutputDialog(new StringBuilder().AppendJoin(' ', list).ToString()).ShowAsync();
-
-            }
-            finally
-            {
-                (sender.IsEnabled, sender.Content) = (true, btnText);
-            }
-        }
-
-        private void Input_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-            var ofd = new OpenFileDialog
-            {
-                Filter = "INI文件|*.ini|所有文件|*.*"
+                IniSorterTool.NAME,
+                IniSorterTool.FILE_INPUT,
+                $"\"{e.InputFile}\"",
+                IniSorterTool.FILE_OUTPUT,
+                $"\"{e.OutputFile}\""
             };
-            if (ofd.ShowDialog() ?? false)
-            {
-                var fileInfo = new FileInfo(ofd.FileName);
-                sender.Text = fileInfo.FullName;
-                ASB_Output.Text = fileInfo.FullName.Substring(0, fileInfo.FullName.Length - fileInfo.Extension.Length) + ".out.ini";
-            }
-        }
 
-        private void Output_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-            var sfd = new SaveFileDialog
+            if (!string.IsNullOrWhiteSpace(tbTargetSectionName.Text))
             {
-                Filter = "INI文件|*.ini|所有文件|*.*"
-            };
-            if (sfd.ShowDialog() ?? false)
-            {
-                sender.Text = sfd.FileName;
+                list.Add(IniSorterTool.TARGET_SECTION);
+                list.Add(tbTargetSectionName.Text);
             }
+
+            if (!string.IsNullOrWhiteSpace(tbPrefix.Text))
+            {
+                list.Add(IniSorterTool.PREFIX);
+                list.Add(tbPrefix.Text);
+            }
+
+            if (!string.IsNullOrWhiteSpace(tbPrefixKey.Text))
+            {
+                list.Add(IniSorterTool.PREFIX_KEY);
+                list.Add(tbPrefixKey.Text);
+            }
+
+            if (!string.IsNullOrWhiteSpace(tbFirst.Text))
+            {
+                list.Add(IniSorterTool.START_NUM);
+                list.Add(tbFirst.Value.ToString());
+            }
+
+            if (!string.IsNullOrWhiteSpace(tbDigit.Text))
+            {
+                list.Add(IniSorterTool.DIGIT);
+                list.Add(tbDigit.Value.ToString());
+            }
+
+            if (!string.IsNullOrWhiteSpace(tbSummaryKey.Text))
+            {
+                list.Add(IniSorterTool.SUMMARY_KEY);
+                list.Add(tbSummaryKey.Text);
+            }
+
+            if (cbSort.IsOn)
+                list.Add(IniSorterTool.SORT);
+
+            if (!string.IsNullOrWhiteSpace(tbSortTargetKey.Text))
+            {
+                list.Add(IniSorterTool.SORT_KEYS);
+                list.Add(tbSortTargetKey.Text);
+            }
+
+            if (!string.IsNullOrWhiteSpace(tbKeyConstraint.Text))
+            {
+                list.Add(IniSorterTool.CONSTRAINT_KEY);
+                list.Add(tbKeyConstraint.Text);
+            }
+
+            if (!string.IsNullOrWhiteSpace(tbValueConstraint.Text))
+            {
+                list.Add(IniSorterTool.CONSTRAINT_VALUE);
+                list.Add(tbValueConstraint.Text);
+            }
+
+            await new ConsoleOutputDialog(new StringBuilder().AppendJoin(' ', list).ToString()).ShowAsync();
         }
     }
 }

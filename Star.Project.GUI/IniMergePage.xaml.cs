@@ -43,56 +43,19 @@ namespace Star.Project.GUI
             await Task.Delay(0);
         }
 
-        public async Task Start(Button sender, RoutedEventArgs e)
+        public async Task Start(object sender, StartEventArgs e)
         {
-            var btnText = sender.Content;
-            (sender.IsEnabled, sender.Content) = (false, "正在处理");
-            try
+            var list = new List<string>
             {
-                if (string.IsNullOrWhiteSpace(ASB_Input.Text)
-                    || string.IsNullOrWhiteSpace(ASB_Output.Text))
-                    throw new ArgumentNullException("未指定输入或输出文件");
-
-                var list = new List<string>
-                {
-                    IniMergeTool.NAME,
-                    IniMergeTool.FILE_INPUT,
-                    $"\"{ASB_Input.Text}\"",
-                    IniMergeTool.FILE_OUTPUT,
-                    $"\"{ASB_Output.Text}\"",
-                };
-
-                await new ConsoleOutputDialog(new StringBuilder().AppendJoin(' ', list).ToString()).ShowAsync();
-            }
-            finally
-            {
-                (sender.IsEnabled, sender.Content) = (true, btnText);
-            }
-        }
-        private void Input_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-            var ofd = new OpenFileDialog
-            {
-                Filter = "INI文件|*.ini|所有文件|*.*"
+                IniMergeTool.NAME,
+                IniMergeTool.FILE_INPUT,
+                $"\"{e.InputFile}\"",
+                IniMergeTool.FILE_OUTPUT,
+                $"\"{e.OutputFile}\""
             };
-            if (ofd.ShowDialog() ?? false)
-            {
-                var fileInfo = new FileInfo(ofd.FileName);
-                sender.Text = fileInfo.FullName;
-                this.ASB_Output.Text = fileInfo.FullName.Substring(0, fileInfo.FullName.Length - fileInfo.Extension.Length) + ".out.ini";
-            }
-        }
 
-        private void Output_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-            var sfd = new SaveFileDialog
-            {
-                Filter = "INI文件|*.ini|所有文件|*.*"
-            };
-            if (sfd.ShowDialog() ?? false)
-            {
-                sender.Text = sfd.FileName;
-            }
+            await new ConsoleOutputDialog(new StringBuilder().AppendJoin(' ', list).ToString()).ShowAsync();
+
         }
     }
 }

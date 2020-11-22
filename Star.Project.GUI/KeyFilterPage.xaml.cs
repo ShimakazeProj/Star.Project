@@ -27,13 +27,12 @@ namespace Star.Project.GUI
     /// </summary>
     public partial class KeyFilterPage : IToolPage
     {
+        public string Help => "键过滤器可以帮助您更方便的过滤INI键";
+
         public KeyFilterPage()
         {
             InitializeComponent();
         }
-
-        public string Help => "键过滤器可以帮助您更方便的过滤INI键";
-
         public async Task ApplyTemplate(Button sender, FileInfo file)
         {
             await using var fs = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -88,69 +87,34 @@ namespace Star.Project.GUI
             await sw.FlushAsync();
         }
 
-        public async Task Start(Button sender, RoutedEventArgs e)
+        public async Task Start(object sender, StartEventArgs e)
         {
-            var btnText = sender.Content;
-            (sender.IsEnabled, sender.Content) = (false, "正在处理");
-            try
+            if (string.IsNullOrWhiteSpace(ASB_Keep_Keys.Text))
             {
-                if (string.IsNullOrWhiteSpace(ASB_Input.Text)
-                    || string.IsNullOrWhiteSpace(ASB_Output.Text))
-                    throw new ArgumentNullException("未指定输入或输出文件");
-                if (string.IsNullOrWhiteSpace(ASB_Keep_Keys.Text))
-                    throw new ArgumentNullException("未指定将要保留的内容");
-
-                var list = new List<string>
-                {
-                    KeyScreenTool.NAME,
-                    KeyScreenTool.FILE_INPUT,
-                    $"\"{ASB_Input.Text}\"",
-                    KeyScreenTool.FILE_OUTPUT,
-                    $"\"{ASB_Output.Text}\"",
-                    KeyScreenTool.KEEP_KEYS,
-                    ASB_Keep_Keys.Text.Replace(';','\x20')
-                };
-
-                if (!string.IsNullOrWhiteSpace(ASB_Ignore_Sections.Text))
-                {
-                    list.Add(KeyScreenTool.IGNORE_SECTIONS);
-                    list.Add(ASB_Ignore_Sections.Text.Replace(';', '\x20'));
-                }
-                if (CB_MatchCase.IsOn) list.Add(KeyScreenTool.MATCH_CASE);
-                if (CB_SortKey.IsOn) list.Add(KeyScreenTool.SORT_KEY);
-
-                await new ConsoleOutputDialog(new StringBuilder().AppendJoin(' ', list).ToString()).ShowAsync();
+                MainWindow.ASB_IsNullWarn(ASB_Keep_Keys);
+                throw new ArgumentNullException("未指定将要保留的内容");
             }
-            finally
-            {
-                (sender.IsEnabled, sender.Content) = (true, btnText);
-            }
-        }
 
-        private void Input_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-            var ofd = new OpenFileDialog
+            var list = new List<string>
             {
-                Filter = "INI文件|*.ini|所有文件|*.*"
+                KeyScreenTool.NAME,
+                KeyScreenTool.FILE_INPUT,
+                $"\"{e.InputFile}\"",
+                KeyScreenTool.FILE_OUTPUT,
+                $"\"{e.OutputFile}\"",
+                KeyScreenTool.KEEP_KEYS,
+                ASB_Keep_Keys.Text.Replace(';','\x20')
             };
-            if (ofd.ShowDialog() ?? false)
-            {
-                var fileInfo = new FileInfo(ofd.FileName);
-                sender.Text = fileInfo.FullName;
-                ASB_Output.Text = fileInfo.FullName.Substring(0, fileInfo.FullName.Length - fileInfo.Extension.Length) + ".out.ini";
-            }
-        }
 
-        private void Output_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-        {
-            var sfd = new SaveFileDialog
+            if (!string.IsNullOrWhiteSpace(ASB_Ignore_Sections.Text))
             {
-                Filter = "INI文件|*.ini|所有文件|*.*"
-            };
-            if (sfd.ShowDialog() ?? false)
-            {
-                sender.Text = sfd.FileName;
+                list.Add(KeyScreenTool.IGNORE_SECTIONS);
+                list.Add(ASB_Ignore_Sections.Text.Replace(';', '\x20'));
             }
+            if (CB_MatchCase.IsOn) list.Add(KeyScreenTool.MATCH_CASE);
+            if (CB_SortKey.IsOn) list.Add(KeyScreenTool.SORT_KEY);
+
+            await new ConsoleOutputDialog(new StringBuilder().AppendJoin(' ', list).ToString()).ShowAsync();
         }
     }
 }

@@ -13,38 +13,11 @@
             <RowDefinition Height="auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <StackPanel>
-            <ui:ThemeShadowChrome Depth="30">
-                <StackPanel>
-                    <StackPanel.Background>
-                        <SolidColorBrush  Color="{ui:ThemeResource SystemChromeLowColor}"/>
-                    </StackPanel.Background>
-                    <TextBlock
-                    Margin="15,5"
-                    FontSize="26" Text="文件" />
-                    <ui:SimpleStackPanel Margin="20,5" Spacing="8">
-                        <ui:AutoSuggestBox x:Name="ASB_Input"
-                        Header="输入文件 (Required)"
-                        QuerySubmitted="Input_QuerySubmitted">
-                            <ui:AutoSuggestBox.QueryIcon>
-                                <ui:SymbolIcon Symbol="OpenFile" />
-                            </ui:AutoSuggestBox.QueryIcon>
-                        </ui:AutoSuggestBox>
-                        <ui:AutoSuggestBox x:Name="ASB_Output"
-                        Header="输出文件" QuerySubmitted="Output_QuerySubmitted">
-                            <ui:AutoSuggestBox.QueryIcon>
-                                <ui:SymbolIcon Symbol="OpenFile" />
-                            </ui:AutoSuggestBox.QueryIcon>
-                        </ui:AutoSuggestBox>
-                    </ui:SimpleStackPanel>
-                </StackPanel>
-            </ui:ThemeShadowChrome>
-            <TextBlock Margin="15 5" FontSize="26" Text="选项" />
-        </StackPanel>
+        <TextBlock Margin="15 5" FontSize="26" Text="选项" />
         
         <ui:ScrollViewerEx x:Name="sv" Grid.Row="1">
             <ui:SimpleStackPanel Margin="30 0" Spacing="8">
-                <ui:AutoSuggestBox x:Name="ASB_Keep_Keys" Header="保留键名(使用分号或空格分隔)" ToolTip="输入若干个需要保留的键名, 将删除所有未在列表中的键, 若经过处理后节内容为空, 则删除该节 (Default: {null})" />
+                <ui:AutoSuggestBox x:Name="ASB_Keep_Keys" Header="保留键名(使用分号或空格分隔) *" ToolTip="输入若干个需要保留的键名, 将删除所有未在列表中的键, 若经过处理后节内容为空, 则删除该节 (Default: {null})" />
                 <ui:AutoSuggestBox x:Name="ASB_Ignore_Sections" Header="忽略节名(使用分号或空格分隔)" ToolTip="输入若干个不需要保留的节名, 将删除所有在列表中的节 (Default: {null})" />
                 <ui:ToggleSwitch x:Name="CB_MatchCase" Header="区分大小写" ToolTip="区分大小写 (Default: false)" />
                 <ui:ToggleSwitch x:Name="CB_SortKey" Header="排序键" ToolTip="按照 &quot;保留键名&quot; 的顺序排序 (Default: false)" />
